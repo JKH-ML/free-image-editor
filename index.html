@@ -35,8 +35,37 @@
     </header>
 
     <main class="app-container">
-        <!-- Initial Upload State -->
-        <section id="upload-section" class="full-screen-drop">
+        <!-- Landing Page: Menu Selection -->
+        <section id="landing-section" class="landing-page">
+            <div class="landing-content">
+                <h2 class="landing-title" data-i18n="landing-welcome">What would you like to do?</h2>
+                <div class="menu-grid">
+                    <div class="menu-card" data-mode="crop">
+                        <div class="menu-icon"><i data-lucide="crop"></i></div>
+                        <h3 data-i18n="menu-crop-title">SNS Crop</h3>
+                        <p data-i18n="menu-crop-desc">Resize & Crop for Instagram, YouTube, etc.</p>
+                    </div>
+                    <div class="menu-card" data-mode="enhance">
+                        <div class="menu-icon"><i data-lucide="palette"></i></div>
+                        <h3 data-i18n="menu-enhance-title">Enhance</h3>
+                        <p data-i18n="menu-enhance-desc">Adjust colors and apply artistic filters.</p>
+                    </div>
+                    <div class="menu-card" data-mode="batch">
+                        <div class="menu-icon"><i data-lucide="layers"></i></div>
+                        <h3 data-i18n="menu-batch-title">Bulk Convert</h3>
+                        <p data-i18n="menu-batch-desc">Convert multiple images to ZIP at once.</p>
+                    </div>
+                    <div class="menu-card" data-mode="full">
+                        <div class="menu-icon"><i data-lucide="wrench"></i></div>
+                        <h3 data-i18n="menu-full-title">Full Editor</h3>
+                        <p data-i18n="menu-full-desc">Access all editing tools in one place.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Upload State (Hidden initially) -->
+        <section id="upload-section" class="full-screen-drop hidden">
             <div id="drop-zone" class="drop-zone-content">
                 <div class="upload-icon-wrapper">
                     <i data-lucide="upload-cloud" class="upload-icon"></i>

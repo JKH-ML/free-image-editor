@@ -97,6 +97,82 @@ h1 {
     color: var(--fg);
 }
 
+/* Landing Page */
+.landing-page {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.landing-content {
+    max-width: 900px;
+    width: 100%;
+    text-align: center;
+}
+
+.landing-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 3rem;
+    letter-spacing: -0.02em;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.menu-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.menu-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    background: var(--muted);
+}
+
+.menu-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--muted);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    transition: all 0.3s;
+}
+
+.menu-card:hover .menu-icon {
+    background: var(--primary);
+    color: var(--primary-fg);
+}
+
+.menu-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.menu-card p {
+    font-size: 0.875rem;
+    color: var(--muted-fg);
+    line-height: 1.4;
+}
+
 /* Container */
 .app-container {
     height: calc(100vh - 100px);

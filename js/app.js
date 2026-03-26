@@ -49,6 +49,19 @@ let cropper = null;
 let isComparing = false;
 let copiedSettings = null;
 
+const landingSection = document.getElementById('landing-section');
+const menuCards = document.querySelectorAll('.menu-card');
+
+// Handle Menu Card Selection
+menuCards.forEach(card => {
+    card.addEventListener('click', () => {
+        const mode = card.dataset.mode;
+        // mode logic can be used here to pre-set configurations
+        landingSection.classList.add('hidden');
+        uploadSection.classList.remove('hidden');
+    });
+});
+
 // Handle Upload
 dropZone.addEventListener('click', () => fileInput.click());
 btnAddMore.addEventListener('click', () => fileInput.click());
