@@ -37,6 +37,18 @@ IMAGE-CUT is a high-performance image editing tool that runs instantly in the br
 
 ---
 
+## 📜 VERSION HISTORY
+
+### v1.0.0 (2026-03-26)
+*   **Initial Launch**: Core image editing engine implemented.
+*   **Professional Cropping**: Integrated Cropper.js with SNS-optimized aspect ratios.
+*   **Batch Workflow**: Added multi-image queue and "Download All as ZIP" functionality.
+*   **Settings Sync**: Implemented "Copy/Paste Settings" for consistent editing across multiple photos.
+*   **Localized Experience**: Full support for English, Korean, Chinese, and Japanese.
+*   **Privacy-First**: Established 100% client-side processing architecture.
+
+---
+
 ## 📄 LICENSE
 
 This project is licensed under the MIT License.
