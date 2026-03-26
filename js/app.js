@@ -31,17 +31,6 @@ const filterBtns = document.querySelectorAll('.filter-chip');
 const ratioBtns = document.querySelectorAll('.ratio-btn');
 const exportFormat = document.getElementById('export-format');
 const qualityContainer = document.getElementById('quality-container');
-const languageSelect = document.getElementById('language-select');
-
-// Set initial language select value
-languageSelect.value = localStorage.getItem('lang') || (navigator.language.startsWith('ko') ? 'ko' : navigator.language.startsWith('zh') ? 'zh' : navigator.language.startsWith('ja') ? 'ja' : 'en');
-
-languageSelect.addEventListener('change', (e) => {
-    const lang = e.target.value;
-    localStorage.setItem('lang', lang);
-    currentLang = lang;
-    updateContent();
-});
 
 let images = []; 
 let currentIndex = -1;

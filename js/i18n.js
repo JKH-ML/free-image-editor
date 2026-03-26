@@ -132,7 +132,7 @@ const translations = {
         "menu-crop-desc": "InstagramやYouTubeなどの比率に合わせて調整",
         "menu-enhance-title": "画像補正",
         "menu-enhance-desc": "色調調整やアートフィルターの適用",
-        "menu-batch-title": "一括変換",
+        "menu-batch-title": "一괄変換",
         "menu-batch-desc": "複数の画像を変換してZIPで書き出し",
         "menu-full-title": "統合エディタ",
         "menu-full-desc": "すべての編集ツールを自由に使用",
@@ -165,48 +165,46 @@ const translations = {
         "undo": "元に戻す",
         "redo": "やり直し",
         "compare": "比較",
-        "privacy-note": "すべての処理はブラウザ内でローカルに行われます。データがサーバーに送信されることはありません。"
+        "privacy-note": "すべての処理はブラウザ内でローカルに行われます. データがサーバーに送信されることはありません。"
     }
 };
 
 let currentLang = localStorage.getItem('lang') || (navigator.language.startsWith('ko') ? 'ko' : navigator.language.startsWith('zh') ? 'zh' : navigator.language.startsWith('ja') ? 'ja' : 'en');
 
 function updateContent() {
+    const langData = translations[currentLang] || translations.en;
+    
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        el.textContent = translations[currentLang][key];
+        if (langData[key]) {
+            el.textContent = langData[key];
+        }
     });
-    // For elements with i18n title attributes
+
     document.querySelectorAll('[data-i18n-title]').forEach(el => {
         const key = el.getAttribute('data-i18n-title');
-        el.title = translations[currentLang][key];
+        if (langData[key]) {
+            el.title = langData[key];
+        }
     });
+
     document.documentElement.lang = currentLang;
+    
+    // Update select element if it exists
+    const select = document.getElementById('language-select');
+    if (select) select.value = currentLang;
 }
 
-document.getElementById('btn-ko').addEventListener('click', () => {
-    currentLang = 'ko';
-    localStorage.setItem('lang', 'ko');
+// Global initialization
+window.addEventListener('DOMContentLoaded', () => {
     updateContent();
+    
+    const select = document.getElementById('language-select');
+    if (select) {
+        select.addEventListener('change', (e) => {
+            currentLang = e.target.value;
+            localStorage.setItem('lang', currentLang);
+            updateContent();
+        });
+    }
 });
-
-document.getElementById('btn-en').addEventListener('click', () => {
-    currentLang = 'en';
-    localStorage.setItem('lang', 'en');
-    updateContent();
-});
-
-document.getElementById('btn-zh').addEventListener('click', () => {
-    currentLang = 'zh';
-    localStorage.setItem('lang', 'zh');
-    updateContent();
-});
-
-document.getElementById('btn-ja').addEventListener('click', () => {
-    currentLang = 'ja';
-    localStorage.setItem('lang', 'ja');
-    updateContent();
-});
-
-// Initial update
-updateContent();
