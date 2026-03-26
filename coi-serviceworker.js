@@ -31,7 +31,7 @@ if (typeof window === "undefined") {
 } else {
     (() => {
         const script = document.currentScript;
-        if (window.crossOriginIsolated !== false || !navigator.serviceWorker) {
+        if (window.crossOriginIsolated || !navigator.serviceWorker) {
             return;
         }
 
