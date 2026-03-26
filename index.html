@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Cut - Unlimited Free Image Editor</title>
+    <meta name="description" content="Unlimited Free + Open Source. No Signup · No Ads · No Watermarks · No Data Collection. Simple and powerful image editor in your browser.">
+    <link rel="stylesheet" href="style.css">
+    <!-- COI Service Worker for SharedArrayBuffer support on GitHub Pages -->
+    <script src="js/coi-serviceworker.js"></script>
+</head>
+<body class="dark-theme">
+    <header>
+        <div class="container">
+            <h1 data-i18n="title">Image Cut</h1>
+            <nav>
+                <div class="marketing-points">
+                    <span data-i18n="point1">Unlimited Free</span> • 
+                    <span data-i18n="point2">Open Source</span> • 
+                    <span data-i18n="point3">No Signup</span> • 
+                    <span data-i18n="point4">No Ads</span>
+                </div>
+                <div class="lang-switcher">
+                    <button id="btn-ko">KO</button>
+                    <button id="btn-en">EN</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="upload-section" class="card">
+            <div id="drop-zone">
+                <p data-i18n="drop-text">이미지를 드래그하거나 클릭하여 업로드하세요</p>
+                <input type="file" id="file-input" accept="image/*" hidden>
+            </div>
+        </section>
+
+        <section id="editor-section" class="hidden">
+            <div class="editor-layout">
+                <div class="canvas-container card">
+                    <canvas id="main-canvas"></canvas>
+                </div>
+                
+                <aside class="controls card">
+                    <div class="control-group">
+                        <label data-i18n="resize">크기 조절</label>
+                        <div class="input-row">
+                            <input type="number" id="input-width" placeholder="Width">
+                            <span>x</span>
+                            <input type="number" id="input-height" placeholder="Height">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label data-i18n="filters">필터</label>
+                        <div class="filter-grid">
+                            <button class="filter-btn" data-filter="none" data-i18n="filter-none">원본</button>
+                            <button class="filter-btn" data-filter="grayscale" data-i18n="filter-gray">그레이스케일</button>
+                            <button class="filter-btn" data-filter="sepia" data-i18n="filter-sepia">세피아</button>
+                            <button class="filter-btn" data-filter="invert" data-i18n="filter-invert">반전</button>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label data-i18n="format">형식 변환</label>
+                        <select id="export-format">
+                            <option value="image/png">PNG</option>
+                            <option value="image/jpeg">JPG</option>
+                            <option value="image/webp">WebP</option>
+                            <option value="image/gif">GIF</option>
+                        </select>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button id="btn-download" class="primary-btn" data-i18n="download">다운로드</button>
+                        <button id="btn-reset" class="secondary-btn" data-i18n="reset">초기화</button>
+                    </div>
+                </aside>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p data-i18n="privacy-note">모든 처리는 브라우저에서 로컬로 수행됩니다. 데이터는 서버로 전송되지 않습니다.</p>
+            <div class="footer-links">
+                <a href="https://github.com/yourusername/image-cut" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/i18n.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
