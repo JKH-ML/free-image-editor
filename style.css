@@ -243,6 +243,15 @@ input[type="range"] {
     cursor: pointer;
 }
 
+.secondary-btn:hover {
+    background: var(--accent);
+}
+
+#btn-compare.active {
+    background: var(--primary);
+    color: var(--primary-text);
+}
+
 .hidden {
     display: none;
 }

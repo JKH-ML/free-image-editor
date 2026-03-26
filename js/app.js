@@ -26,6 +26,11 @@ const rangeSaturation = document.getElementById('range-saturation');
 const btnUndo = document.getElementById('btn-undo');
 const btnRedo = document.getElementById('btn-redo');
 
+const btnCompare = document.getElementById('btn-compare');
+const btnZoomIn = document.getElementById('btn-zoom-in');
+const btnZoomOut = document.getElementById('btn-zoom-out');
+const btnZoomReset = document.getElementById('btn-zoom-reset');
+
 let originalImage = null;
 let cropper = null;
 let state = {
@@ -39,6 +44,7 @@ let state = {
 
 let undoStack = [];
 let redoStack = [];
+let isComparing = false;
 
 // Handle Upload
 dropZone.addEventListener('click', () => fileInput.click());
@@ -128,14 +134,13 @@ function saveHistory() {
     const currentState = JSON.parse(JSON.stringify(state));
     if (cropper) currentState.cropData = cropper.getData();
     
-    // Prevent saving identical states back-to-back
     if (undoStack.length > 0) {
         const last = undoStack[undoStack.length - 1];
         if (JSON.stringify(last) === JSON.stringify(currentState)) return;
     }
 
     undoStack.push(currentState);
-    redoStack = []; // Clear redo when new action occurs
+    redoStack = [];
     updateHistoryButtons();
 }
 
@@ -147,7 +152,7 @@ function updateHistoryButtons() {
 function renderToCanvas() {
     if (!cropper) return;
 
-    const croppedCanvas = cropper.getCroppedCanvas();
+    const croppedCanvas = isComparing ? getOriginalCroppedCanvas() : cropper.getCroppedCanvas();
     if (!croppedCanvas) return;
 
     const w = parseInt(inputWidth.value) || croppedCanvas.width;
@@ -157,16 +162,34 @@ function renderToCanvas() {
     canvas.height = h;
 
     ctx.save();
-    const filters = [
-        getCanvasFilter(state.filter),
-        `brightness(${state.brightness}%)`,
-        `contrast(${state.contrast}%)`,
-        `saturate(${state.saturation}%)`
-    ].join(' ');
+    if (!isComparing) {
+        const filters = [
+            getCanvasFilter(state.filter),
+            `brightness(${state.brightness}%)`,
+            `contrast(${state.contrast}%)`,
+            `saturate(${state.saturation}%)`
+        ].join(' ');
+        ctx.filter = filters;
+    }
     
-    ctx.filter = filters;
     ctx.drawImage(croppedCanvas, 0, 0, w, h);
     ctx.restore();
+}
+
+function getOriginalCroppedCanvas() {
+    // To show original without filters, we need a clean crop from originalImage
+    const data = cropper.getData();
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = data.width;
+    tempCanvas.height = data.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    tempCtx.drawImage(
+        originalImage,
+        data.x, data.y, data.width, data.height,
+        0, 0, data.width, data.height
+    );
+    return tempCanvas;
 }
 
 function getCanvasFilter(filter) {
@@ -179,25 +202,46 @@ function getCanvasFilter(filter) {
     }
 }
 
+// Compare & Zoom Controls
+btnCompare.addEventListener('mousedown', () => {
+    isComparing = true;
+    btnCompare.classList.add('active');
+    renderToCanvas();
+});
+
+btnCompare.addEventListener('mouseup', () => {
+    isComparing = false;
+    btnCompare.classList.remove('active');
+    renderToCanvas();
+});
+
+btnCompare.addEventListener('mouseleave', () => {
+    if (isComparing) {
+        isComparing = false;
+        btnCompare.classList.remove('active');
+        renderToCanvas();
+    }
+});
+
+btnZoomIn.addEventListener('click', () => { cropper.zoom(0.1); renderToCanvas(); });
+btnZoomOut.addEventListener('click', () => { cropper.zoom(-0.1); renderToCanvas(); });
+btnZoomReset.addEventListener('click', () => { cropper.reset(); renderToCanvas(); });
+
 // History Controls
 btnUndo.addEventListener('click', () => {
     if (undoStack.length === 0) return;
-    
     const current = JSON.parse(JSON.stringify(state));
     if (cropper) current.cropData = cropper.getData();
     redoStack.push(current);
-
     const prevState = undoStack.pop();
     applyState(prevState);
 });
 
 btnRedo.addEventListener('click', () => {
     if (redoStack.length === 0) return;
-
     const current = JSON.parse(JSON.stringify(state));
     if (cropper) current.cropData = cropper.getData();
     undoStack.push(current);
-
     const nextState = redoStack.pop();
     applyState(nextState);
 });
@@ -214,9 +258,7 @@ function applyState(targetState) {
 
 // Controls listeners
 [rangeBrightness, rangeContrast, rangeSaturation].forEach(el => {
-    el.addEventListener('change', () => {
-        saveHistory();
-    });
+    el.addEventListener('change', () => { saveHistory(); });
     el.addEventListener('input', () => {
         state.brightness = rangeBrightness.value;
         state.contrast = rangeContrast.value;

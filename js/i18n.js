@@ -28,6 +28,7 @@ const translations = {
         "reset": "초기화",
         "undo": "실행 취소",
         "redo": "다시 실행",
+        "compare": "원본 비교",
         "privacy-note": "모든 처리는 브라우저에서 로컬로 수행됩니다. 데이터는 서버로 전송되지 않습니다."
     },
     en: {
@@ -59,6 +60,7 @@ const translations = {
         "reset": "Reset",
         "undo": "Undo",
         "redo": "Redo",
+        "compare": "Compare",
         "privacy-note": "All processing is done locally in your browser. No data is sent to any server."
     },
     zh: {
@@ -90,6 +92,7 @@ const translations = {
         "reset": "重置",
         "undo": "撤回",
         "redo": "重做",
+        "compare": "对比",
         "privacy-note": "所有处理均在您的浏览器中本地完成。数据不会发送到任何服务器。"
     },
     ja: {
@@ -106,13 +109,13 @@ const translations = {
         "brightness": "明るさ",
         "contrast": "コントラスト",
         "saturation": "彩度",
-        "quality": "画질",
+        "quality": "画質",
         "aspect-ratio": "切り抜き比率",
         "ratio-free": "自由",
         "resize": "サイズ変更",
         "filters": "フィルター",
         "filter-none": "元画像",
-        "filter-gray": "グレースケール",
+        "filter-gray": "グレース케ール",
         "filter-sepia": "セピア",
         "filter-invert": "反転",
         "filter-blur": "ぼかし",
@@ -121,7 +124,7 @@ const translations = {
         "reset": "リセット",
         "undo": "元に戻す",
         "redo": "やり直し",
+        "compare": "比較",
         "privacy-note": "すべての処理はブラウザ内でローカルに行われます。データがサーバーに送信されることはありません。"
-        }
-        };
-
+    }
+};
