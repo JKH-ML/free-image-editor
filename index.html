@@ -19,7 +19,7 @@
 <body class="dark-theme">
     <header class="app-header">
         <div class="header-left">
-            <h1 data-i18n="title">Image Editor</h1>
+            <h1 data-i18n="title" id="logo-home" style="cursor: pointer;">Image Editor</h1>
         </div>
         <div class="header-right">
             <select id="language-select" class="app-select-small">
@@ -64,7 +64,7 @@
             </div>
         </section>
 
-        <!-- Upload State (Hidden initially) -->
+        <!-- Upload State -->
         <section id="upload-section" class="full-screen-drop hidden">
             <div id="drop-zone" class="drop-zone-content">
                 <div class="upload-icon-wrapper">
@@ -126,7 +126,7 @@
 
             <!-- Right: Controls -->
             <aside class="sidebar right-sidebar">
-                <div class="control-section">
+                <div class="control-section" id="section-ratio">
                     <label class="section-label" data-i18n="aspect-ratio">Aspect Ratio</label>
                     <div class="ratio-group">
                         <button class="ratio-btn active" data-ratio="NaN" data-i18n="ratio-free">Free</button>
@@ -137,7 +137,7 @@
                     </div>
                 </div>
 
-                <div class="control-section">
+                <div class="control-section" id="section-transform">
                     <label class="section-label" data-i18n="transform">Transform</label>
                     <div class="button-row">
                         <button id="btn-rotate" class="icon-btn-outline" title="Rotate 90°"><i data-lucide="rotate-cw"></i></button>
@@ -146,7 +146,15 @@
                     </div>
                 </div>
 
-                <div class="control-section">
+                <div class="control-section" id="section-resize">
+                    <label class="section-label" data-i18n="resize">Resize</label>
+                    <div class="input-row" style="display: flex; gap: 8px;">
+                        <input type="number" id="input-width" class="app-input" placeholder="Width">
+                        <input type="number" id="input-height" class="app-input" placeholder="Height">
+                    </div>
+                </div>
+
+                <div class="control-section" id="section-adjust">
                     <div class="label-row">
                         <label class="section-label" data-i18n="adjust">Adjust</label>
                         <button id="btn-copy-settings" class="text-link-btn" data-i18n="copy-settings">Copy</button>
@@ -168,7 +176,7 @@
                     </div>
                 </div>
 
-                <div class="control-section">
+                <div class="control-section" id="section-filters">
                     <label class="section-label" data-i18n="filters">Filters</label>
                     <div class="filter-grid-modern">
                         <button class="filter-chip" data-filter="none" data-i18n="filter-none">None</button>
@@ -179,10 +187,10 @@
                     </div>
                 </div>
 
-                <div class="control-section mt-auto border-t pt-4">
+                <div class="control-section mt-auto border-t pt-4" id="section-export">
                     <div class="export-settings">
                         <div class="input-group">
-                            <label data-i18n="format">Format</label>
+                            <label data-i18n="format" class="section-label">Format</label>
                             <select id="export-format" class="app-select">
                                 <option value="image/png">PNG</option>
                                 <option value="image/jpeg">JPEG</option>
@@ -211,9 +219,6 @@
 
     <script src="js/i18n.js"></script>
     <script src="js/app.js"></script>
-    <script>
-        // Initialize Lucide Icons
-        lucide.createIcons();
-    </script>
+    <script>lucide.createIcons();</script>
 </body>
 </html>

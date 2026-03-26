@@ -2,6 +2,9 @@ const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
 const uploadSection = document.getElementById('upload-section');
 const editorSection = document.getElementById('editor-section');
+const landingSection = document.getElementById('landing-section');
+const logoHome = document.getElementById('logo-home');
+
 const canvas = document.getElementById('main-canvas');
 const ctx = canvas.getContext('2d');
 const thumbnailList = document.getElementById('thumbnail-list');
@@ -37,17 +40,64 @@ let currentIndex = -1;
 let cropper = null;
 let isComparing = false;
 let copiedSettings = null;
+let currentMode = 'full';
 
-const landingSection = document.getElementById('landing-section');
-const menuCards = document.querySelectorAll('.menu-card');
+// Navigation: Logo to Home
+logoHome.addEventListener('click', () => {
+    if (images.length > 0) {
+        if (!confirm('Discard all changes and go to home?')) return;
+    }
+    resetApp();
+});
+
+function resetApp() {
+    images = [];
+    currentIndex = -1;
+    if (cropper) cropper.destroy();
+    cropper = null;
+    thumbnailList.innerHTML = '';
+    editorSection.classList.add('hidden');
+    uploadSection.classList.add('hidden');
+    landingSection.classList.remove('hidden');
+}
 
 // Handle Menu Card Selection
+const menuCards = document.querySelectorAll('.menu-card');
 menuCards.forEach(card => {
     card.addEventListener('click', () => {
+        currentMode = card.dataset.mode;
+        applyMode(currentMode);
         landingSection.classList.add('hidden');
         uploadSection.classList.remove('hidden');
     });
 });
+
+function applyMode(mode) {
+    const sections = {
+        ratio: document.getElementById('section-ratio'),
+        transform: document.getElementById('section-transform'),
+        resize: document.getElementById('section-resize'),
+        adjust: document.getElementById('section-adjust'),
+        filters: document.getElementById('section-filters'),
+        export: document.getElementById('section-export'),
+        queue: document.getElementById('image-queue')
+    };
+
+    // Reset all to visible
+    Object.values(sections).forEach(s => s.classList.remove('hidden'));
+
+    if (mode === 'crop') {
+        sections.adjust.classList.add('hidden');
+        sections.filters.classList.add('hidden');
+    } else if (mode === 'enhance') {
+        sections.ratio.classList.add('hidden');
+        sections.resize.classList.add('hidden');
+        sections.transform.classList.add('hidden');
+    } else if (mode === 'batch') {
+        // Highlight queue and export
+    }
+    // 'full' mode shows everything
+}
 
 // Handle Upload
 dropZone.addEventListener('click', () => fileInput.click());
@@ -154,7 +204,6 @@ function updateUIFromState() {
     rangeContrast.value = s.contrast;
     rangeSaturation.value = s.saturation;
     
-    // Update labels
     rangeBrightness.closest('.slider-item').querySelector('.val').textContent = s.brightness;
     rangeContrast.closest('.slider-item').querySelector('.val').textContent = s.contrast;
     rangeSaturation.closest('.slider-item').querySelector('.val').textContent = s.saturation;
@@ -171,6 +220,7 @@ function updateUIFromState() {
 
 function saveHistory() {
     const item = images[currentIndex];
+    if (!item) return;
     const currentState = JSON.parse(JSON.stringify(item.state));
     if (cropper) currentState.cropData = cropper.getData();
     if (item.undoStack.length > 0 && JSON.stringify(item.undoStack[item.undoStack.length - 1]) === JSON.stringify(currentState)) return;
