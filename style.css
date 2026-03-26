@@ -134,10 +134,42 @@ input[type="number"], select {
     width: 100%;
 }
 
+.button-row {
+    display: flex;
+    gap: 10px;
+}
+
+.button-row button {
+    flex: 1;
+    background: var(--bg-color);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.button-row button:hover {
+    background: var(--accent);
+}
+
+.range-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+input[type="range"] {
+    width: 100%;
+    accent-color: var(--primary);
+}
+
 .filter-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 8px;
 }
 
 .filter-btn {

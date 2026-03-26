@@ -45,11 +45,36 @@
                 
                 <aside class="controls card">
                     <div class="control-group">
+                        <label data-i18n="transform">변환</label>
+                        <div class="button-row">
+                            <button id="btn-rotate" title="Rotate 90°">↻</button>
+                            <button id="btn-flip-h" title="Flip Horizontal">↔</button>
+                            <button id="btn-flip-v" title="Flip Vertical">↕</button>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
                         <label data-i18n="resize">크기 조절</label>
                         <div class="input-row">
                             <input type="number" id="input-width" placeholder="Width">
                             <span>x</span>
                             <input type="number" id="input-height" placeholder="Height">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label data-i18n="adjust">보정</label>
+                        <div class="range-group">
+                            <span data-i18n="brightness">밝기</span>
+                            <input type="range" id="range-brightness" min="0" max="200" value="100">
+                        </div>
+                        <div class="range-group">
+                            <span data-i18n="contrast">대비</span>
+                            <input type="range" id="range-contrast" min="0" max="200" value="100">
+                        </div>
+                        <div class="range-group">
+                            <span data-i18n="saturation">채도</span>
+                            <input type="range" id="range-saturation" min="0" max="200" value="100">
                         </div>
                     </div>
 
@@ -60,17 +85,22 @@
                             <button class="filter-btn" data-filter="grayscale" data-i18n="filter-gray">그레이스케일</button>
                             <button class="filter-btn" data-filter="sepia" data-i18n="filter-sepia">세피아</button>
                             <button class="filter-btn" data-filter="invert" data-i18n="filter-invert">반전</button>
+                            <button class="filter-btn" data-filter="blur" data-i18n="filter-blur">흐림</button>
                         </div>
                     </div>
 
                     <div class="control-group">
-                        <label data-i18n="format">형식 변환</label>
+                        <label data-i18n="format">내보내기 설정</label>
                         <select id="export-format">
                             <option value="image/png">PNG</option>
                             <option value="image/jpeg">JPG</option>
                             <option value="image/webp">WebP</option>
                             <option value="image/gif">GIF</option>
                         </select>
+                        <div id="quality-container" class="range-group hidden">
+                            <span data-i18n="quality">품질</span>
+                            <input type="range" id="range-quality" min="1" max="100" value="90">
+                        </div>
                     </div>
 
                     <div class="action-buttons">
