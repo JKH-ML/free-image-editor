@@ -179,6 +179,11 @@ input[type="number"], select {
     background: var(--accent);
 }
 
+.button-row button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
 .range-group {
     display: flex;
     flex-direction: column;

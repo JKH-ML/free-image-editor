@@ -26,6 +26,8 @@ const translations = {
         "format": "내보내기 설정",
         "download": "다운로드",
         "reset": "초기화",
+        "undo": "실행 취소",
+        "redo": "다시 실행",
         "privacy-note": "모든 처리는 브라우저에서 로컬로 수행됩니다. 데이터는 서버로 전송되지 않습니다."
     },
     en: {
@@ -55,6 +57,8 @@ const translations = {
         "format": "Export Settings",
         "download": "Download",
         "reset": "Reset",
+        "undo": "Undo",
+        "redo": "Redo",
         "privacy-note": "All processing is done locally in your browser. No data is sent to any server."
     },
     zh: {
@@ -84,6 +88,8 @@ const translations = {
         "format": "导出设置",
         "download": "下载",
         "reset": "重置",
+        "undo": "撤回",
+        "redo": "重做",
         "privacy-note": "所有处理均在您的浏览器中本地完成。数据不会发送到任何服务器。"
     },
     ja: {
@@ -100,7 +106,7 @@ const translations = {
         "brightness": "明るさ",
         "contrast": "コントラスト",
         "saturation": "彩度",
-        "quality": "画質",
+        "quality": "画질",
         "aspect-ratio": "切り抜き比率",
         "ratio-free": "自由",
         "resize": "サイズ変更",
@@ -113,43 +119,9 @@ const translations = {
         "format": "書き出し設定",
         "download": "ダウンロード",
         "reset": "リセット",
+        "undo": "元に戻す",
+        "redo": "やり直し",
         "privacy-note": "すべての処理はブラウザ内でローカルに行われます。データがサーバーに送信されることはありません。"
-    }
-};
+        }
+        };
 
-let currentLang = localStorage.getItem('lang') || (navigator.language.startsWith('ko') ? 'ko' : navigator.language.startsWith('zh') ? 'zh' : navigator.language.startsWith('ja') ? 'ja' : 'en');
-
-function updateContent() {
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        el.textContent = translations[currentLang][key];
-    });
-    document.documentElement.lang = currentLang;
-}
-
-document.getElementById('btn-ko').addEventListener('click', () => {
-    currentLang = 'ko';
-    localStorage.setItem('lang', 'ko');
-    updateContent();
-});
-
-document.getElementById('btn-en').addEventListener('click', () => {
-    currentLang = 'en';
-    localStorage.setItem('lang', 'en');
-    updateContent();
-});
-
-document.getElementById('btn-zh').addEventListener('click', () => {
-    currentLang = 'zh';
-    localStorage.setItem('lang', 'zh');
-    updateContent();
-});
-
-document.getElementById('btn-ja').addEventListener('click', () => {
-    currentLang = 'ja';
-    localStorage.setItem('lang', 'ja');
-    updateContent();
-});
-
-// Initial update
-updateContent();
