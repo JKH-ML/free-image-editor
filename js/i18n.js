@@ -142,7 +142,7 @@ const translations = {
         "drop-text": "画像をドラッグ＆ドロップするか、クリックしてアップロード",
         "queue-title": "画像リスト",
         "copy-settings": "設定をコピー",
-        "paste-settings": "設定を貼り付け",
+        "paste-settings": "設定를 貼り付け",
         "transform": "変換",
         "adjust": "調整",
         "brightness": "明るさ",
@@ -169,11 +169,18 @@ const translations = {
     }
 };
 
+// Initialize current language
 let currentLang = localStorage.getItem('lang') || (navigator.language.startsWith('ko') ? 'ko' : navigator.language.startsWith('zh') ? 'zh' : navigator.language.startsWith('ja') ? 'ja' : 'en');
+
+// Fallback to 'en' if the currentLang is not valid in translations
+if (!translations[currentLang]) {
+    currentLang = 'en';
+}
 
 function updateContent() {
     const langData = translations[currentLang] || translations.en;
     
+    // Update all text content
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (langData[key]) {
@@ -181,6 +188,7 @@ function updateContent() {
         }
     });
 
+    // Update all title attributes
     document.querySelectorAll('[data-i18n-title]').forEach(el => {
         const key = el.getAttribute('data-i18n-title');
         if (langData[key]) {
@@ -190,13 +198,18 @@ function updateContent() {
 
     document.documentElement.lang = currentLang;
     
-    // Update select element if it exists
+    // Sync the select dropdown value if it exists
     const select = document.getElementById('language-select');
-    if (select) select.value = currentLang;
+    if (select) {
+        select.value = currentLang;
+    }
 }
 
-// Global initialization
-window.addEventListener('DOMContentLoaded', () => {
+// Attach to window so other scripts can call it if needed
+window.updateContent = updateContent;
+
+// Initialize on DOM Ready
+document.addEventListener('DOMContentLoaded', () => {
     updateContent();
     
     const select = document.getElementById('language-select');
