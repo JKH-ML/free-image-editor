@@ -34,10 +34,46 @@ const translations = {
         "download": "Download",
         "reset": "Reset",
         "privacy-note": "All processing is done locally in your browser. No data is sent to any server."
+    },
+    zh: {
+        "title": "Image Cut (图片裁剪)",
+        "point1": "无限免费",
+        "point2": "开源项目",
+        "point3": "无需注册",
+        "point4": "无广告",
+        "drop-text": "拖放或点击上传图片",
+        "resize": "调整大小",
+        "filters": "滤镜",
+        "filter-none": "原图",
+        "filter-gray": "灰度",
+        "filter-sepia": "复古",
+        "filter-invert": "反转",
+        "format": "格式转换",
+        "download": "下载",
+        "reset": "重置",
+        "privacy-note": "所有处理均在您的浏览器中本地完成。数据不会发送到任何服务器。"
+    },
+    ja: {
+        "title": "Image Cut (画像編集)",
+        "point1": "完全無料",
+        "point2": "オープンソース",
+        "point3": "登録不要",
+        "point4": "広告なし",
+        "drop-text": "画像をドラッグ＆ドロップするか、クリックしてアップロードしてください",
+        "resize": "サイズ変更",
+        "filters": "フィルター",
+        "filter-none": "元画像",
+        "filter-gray": "グレースケール",
+        "filter-sepia": "セピア",
+        "filter-invert": "反転",
+        "format": "形式変換",
+        "download": "ダウンロード",
+        "reset": "リセット",
+        "privacy-note": "すべての処理はブラウザ内でローカルに行われます。データがサーバーに送信されることはありません。"
     }
 };
 
-let currentLang = localStorage.getItem('lang') || (navigator.language.startsWith('ko') ? 'ko' : 'en');
+let currentLang = localStorage.getItem('lang') || (navigator.language.startsWith('ko') ? 'ko' : navigator.language.startsWith('zh') ? 'zh' : navigator.language.startsWith('ja') ? 'ja' : 'en');
 
 function updateContent() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -56,6 +92,18 @@ document.getElementById('btn-ko').addEventListener('click', () => {
 document.getElementById('btn-en').addEventListener('click', () => {
     currentLang = 'en';
     localStorage.setItem('lang', 'en');
+    updateContent();
+});
+
+document.getElementById('btn-zh').addEventListener('click', () => {
+    currentLang = 'zh';
+    localStorage.setItem('lang', 'zh');
+    updateContent();
+});
+
+document.getElementById('btn-ja').addEventListener('click', () => {
+    currentLang = 'ja';
+    localStorage.setItem('lang', 'ja');
     updateContent();
 });
 
