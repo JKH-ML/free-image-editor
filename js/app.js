@@ -1,8 +1,8 @@
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
-const uploadSection = document.getElementById('upload-section');
-const editorSection = document.getElementById('editor-section');
-const landingSection = document.getElementById('landing-section');
+const viewLanding = document.getElementById('view-landing');
+const viewUpload = document.getElementById('view-upload');
+const viewEditor = document.getElementById('view-editor');
 const logoHome = document.getElementById('logo-home');
 
 const canvas = document.getElementById('main-canvas');
@@ -42,48 +42,73 @@ let isComparing = false;
 let copiedSettings = null;
 let currentMode = 'full';
 
-// Navigation: Logo to Home
+// --- Router ---
+const routes = {
+    'home': () => {
+        showView(viewLanding);
+    },
+    'upload': () => {
+        showView(viewUpload);
+    },
+    'editor': () => {
+        if (images.length === 0) {
+            navigate('home');
+            return;
+        }
+        showView(viewEditor);
+        applyModeUI(currentMode);
+    }
+};
+
+function navigate(routeName, mode = null) {
+    if (mode) currentMode = mode;
+    window.location.hash = routeName;
+}
+
+function handleRoute() {
+    const hash = window.location.hash.replace('#', '') || 'home';
+    const route = routes[hash] || routes['home'];
+    route();
+}
+
+function showView(viewElement) {
+    [viewLanding, viewUpload, viewEditor].forEach(v => v.classList.add('hidden'));
+    viewElement.classList.remove('hidden');
+}
+
+window.addEventListener('hashchange', handleRoute);
+window.addEventListener('load', handleRoute);
+
+// --- Logo Home ---
 logoHome.addEventListener('click', () => {
     if (images.length > 0) {
         if (!confirm('Discard all changes and go to home?')) return;
     }
-    resetApp();
-});
-
-function resetApp() {
     images = [];
     currentIndex = -1;
     if (cropper) cropper.destroy();
     cropper = null;
     thumbnailList.innerHTML = '';
-    editorSection.classList.add('hidden');
-    uploadSection.classList.add('hidden');
-    landingSection.classList.remove('hidden');
-}
+    navigate('home');
+});
 
-// Handle Menu Card Selection
-const menuCards = document.querySelectorAll('.menu-card');
-menuCards.forEach(card => {
+// --- Menu Selection ---
+document.querySelectorAll('.menu-card').forEach(card => {
     card.addEventListener('click', () => {
-        currentMode = card.dataset.mode;
-        applyMode(currentMode);
-        landingSection.classList.add('hidden');
-        uploadSection.classList.remove('hidden');
+        const mode = card.dataset.route;
+        navigate('upload', mode);
     });
 });
 
-function applyMode(mode) {
+function applyModeUI(mode) {
     const sections = {
         ratio: document.getElementById('section-ratio'),
         transform: document.getElementById('section-transform'),
         resize: document.getElementById('section-resize'),
         adjust: document.getElementById('section-adjust'),
-        filters: document.getElementById('section-filters'),
-        export: document.getElementById('section-export'),
-        queue: document.getElementById('image-queue')
+        filters: document.getElementById('section-filters')
     };
 
-    // Reset all to visible
     Object.values(sections).forEach(s => s.classList.remove('hidden'));
 
     if (mode === 'crop') {
@@ -93,13 +118,10 @@ function applyMode(mode) {
         sections.ratio.classList.add('hidden');
         sections.resize.classList.add('hidden');
         sections.transform.classList.add('hidden');
-    } else if (mode === 'batch') {
-        // Highlight queue and export
     }
-    // 'full' mode shows everything
 }
 
-// Handle Upload
+// --- Upload Logic ---
 dropZone.addEventListener('click', () => fileInput.click());
 btnAddMore.addEventListener('click', () => fileInput.click());
 
@@ -120,12 +142,10 @@ async function handleFiles(files) {
             await addImage(file);
         }
     }
-    if (currentIndex === -1 && images.length > 0) {
-        switchImage(0);
+    if (images.length > 0) {
+        if (currentIndex === -1) switchImage(0);
+        navigate('editor');
     }
-    uploadSection.classList.add('hidden');
-    editorSection.classList.remove('hidden');
-    if (window.lucide) lucide.createIcons();
 }
 
 function addImage(file) {
@@ -137,7 +157,7 @@ function addImage(file) {
                 images.push({
                     file: file,
                     img: img,
-                    state: getDefaultState(),
+                    state: { filter: 'none', brightness: 100, contrast: 100, saturation: 100, aspectRatio: NaN, cropData: null },
                     undoStack: [],
                     redoStack: []
                 });
@@ -148,10 +168,6 @@ function addImage(file) {
         };
         reader.readAsDataURL(file);
     });
-}
-
-function getDefaultState() {
-    return { filter: 'none', brightness: 100, contrast: 100, saturation: 100, aspectRatio: NaN, cropData: null };
 }
 
 function renderThumbnails() {
@@ -166,7 +182,6 @@ function renderThumbnails() {
 }
 
 function switchImage(index) {
-    if (currentIndex === index) return;
     if (currentIndex !== -1 && cropper) {
         images[currentIndex].state.cropData = cropper.getData();
     }
@@ -178,8 +193,12 @@ function switchImage(index) {
 function initEditor(savedState) {
     if (cropper) cropper.destroy();
     const currentItem = images[currentIndex];
-    currentItem.state = JSON.parse(JSON.stringify(savedState));
-    updateUIFromState();
+    const s = currentItem.state;
+    
+    rangeBrightness.value = s.brightness;
+    rangeContrast.value = s.contrast;
+    rangeSaturation.value = s.saturation;
+    updateUIValues();
 
     const tempImg = new Image();
     tempImg.src = currentItem.img.src;
@@ -188,34 +207,23 @@ function initEditor(savedState) {
     container.appendChild(tempImg);
 
     cropper = new Cropper(tempImg, {
-        aspectRatio: currentItem.state.aspectRatio,
+        aspectRatio: s.aspectRatio,
         viewMode: 1,
         autoCropArea: 1,
-        data: currentItem.state.cropData,
+        data: s.cropData,
         ready() { renderToCanvas(); },
         cropend() { saveHistory(); renderToCanvas(); },
         zoom() { renderToCanvas(); }
     });
+    
+    ratioBtns.forEach(btn => btn.classList.toggle('active', (isNaN(s.aspectRatio) && btn.dataset.ratio === 'NaN') || (parseFloat(btn.dataset.ratio) === s.aspectRatio)));
+    filterBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.filter === s.filter));
 }
 
-function updateUIFromState() {
-    const s = images[currentIndex].state;
-    rangeBrightness.value = s.brightness;
-    rangeContrast.value = s.contrast;
-    rangeSaturation.value = s.saturation;
-    
-    rangeBrightness.closest('.slider-item').querySelector('.val').textContent = s.brightness;
-    rangeContrast.closest('.slider-item').querySelector('.val').textContent = s.contrast;
-    rangeSaturation.closest('.slider-item').querySelector('.val').textContent = s.saturation;
-
-    ratioBtns.forEach(btn => btn.classList.toggle('active', 
-        (isNaN(s.aspectRatio) && btn.dataset.ratio === 'NaN') || 
-        (parseFloat(btn.dataset.ratio) === s.aspectRatio)
-    ));
-
-    filterBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.filter === s.filter));
-    
-    updateHistoryButtons();
+function updateUIValues() {
+    rangeBrightness.closest('.slider-item').querySelector('.val').textContent = rangeBrightness.value;
+    rangeContrast.closest('.slider-item').querySelector('.val').textContent = rangeContrast.value;
+    rangeSaturation.closest('.slider-item').querySelector('.val').textContent = rangeSaturation.value;
 }
 
 function saveHistory() {
@@ -240,10 +248,8 @@ function renderToCanvas() {
     if (!cropper || currentIndex === -1) return;
     const croppedCanvas = isComparing ? getOriginalCroppedCanvas() : cropper.getCroppedCanvas();
     if (!croppedCanvas) return;
-
     canvas.width = croppedCanvas.width;
     canvas.height = croppedCanvas.height;
-
     ctx.save();
     if (!isComparing) {
         const s = images[currentIndex].state;
@@ -273,15 +279,13 @@ function getCanvasFilter(filter) {
     }
 }
 
-// Listeners
+// --- Listeners ---
 [rangeBrightness, rangeContrast, rangeSaturation].forEach(el => {
     el.addEventListener('change', () => saveHistory());
     el.addEventListener('input', () => {
         const s = images[currentIndex].state;
-        s.brightness = rangeBrightness.value;
-        s.contrast = rangeContrast.value;
-        s.saturation = rangeSaturation.value;
-        el.closest('.slider-item').querySelector('.val').textContent = el.value;
+        s.brightness = rangeBrightness.value; s.contrast = rangeContrast.value; s.saturation = rangeSaturation.value;
+        updateUIValues();
         renderToCanvas();
     });
 });
@@ -289,8 +293,8 @@ function getCanvasFilter(filter) {
 filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         saveHistory();
-        images[currentIndex].state.filter = btn.getAttribute('data-filter');
-        updateUIFromState();
+        images[currentIndex].state.filter = btn.dataset.filter;
+        filterBtns.forEach(b => b.classList.toggle('active', b === btn));
         renderToCanvas();
     });
 });
@@ -300,7 +304,7 @@ ratioBtns.forEach(btn => {
         saveHistory();
         images[currentIndex].state.aspectRatio = parseFloat(btn.dataset.ratio);
         cropper.setAspectRatio(images[currentIndex].state.aspectRatio);
-        updateUIFromState();
+        ratioBtns.forEach(b => b.classList.toggle('active', b === btn));
     });
 });
 
@@ -314,8 +318,7 @@ btnPasteSettings.addEventListener('click', () => {
     if (!copiedSettings) return;
     saveHistory();
     Object.assign(images[currentIndex].state, copiedSettings);
-    updateUIFromState();
-    renderToCanvas();
+    initEditor(images[currentIndex].state);
 });
 
 btnUndo.addEventListener('click', () => {
@@ -324,7 +327,9 @@ btnUndo.addEventListener('click', () => {
     const current = JSON.parse(JSON.stringify(item.state));
     if (cropper) current.cropData = cropper.getData();
     item.redoStack.push(current);
-    applyState(item.undoStack.pop());
+    const prevState = item.undoStack.pop();
+    images[currentIndex].state = prevState;
+    initEditor(prevState);
 });
 
 btnRedo.addEventListener('click', () => {
@@ -333,18 +338,10 @@ btnRedo.addEventListener('click', () => {
     const current = JSON.parse(JSON.stringify(item.state));
     if (cropper) current.cropData = cropper.getData();
     item.undoStack.push(current);
-    applyState(item.redoStack.pop());
+    const nextState = item.redoStack.pop();
+    images[currentIndex].state = nextState;
+    initEditor(nextState);
 });
-
-function applyState(targetState) {
-    images[currentIndex].state = JSON.parse(JSON.stringify(targetState));
-    updateUIFromState();
-    if (cropper) { 
-        cropper.setAspectRatio(images[currentIndex].state.aspectRatio); 
-        cropper.setData(images[currentIndex].state.cropData); 
-    }
-    renderToCanvas();
-}
 
 btnCompare.addEventListener('mousedown', () => { isComparing = true; btnCompare.classList.add('active'); renderToCanvas(); });
 btnCompare.addEventListener('mouseup', () => { isComparing = false; btnCompare.classList.remove('active'); renderToCanvas(); });
@@ -356,25 +353,17 @@ btnRotate.addEventListener('click', () => { saveHistory(); cropper.rotate(90); }
 btnFlipH.addEventListener('click', () => { saveHistory(); cropper.scaleX(cropper.getData().scaleX * -1); });
 btnFlipV.addEventListener('click', () => { saveHistory(); cropper.scaleY(cropper.getData().scaleY * -1); });
 
-btnReset.addEventListener('click', () => { if (currentIndex !== -1) { saveHistory(); initEditor(getDefaultState()); } });
+btnReset.addEventListener('click', () => { if (currentIndex !== -1) { saveHistory(); images[currentIndex].state = { filter: 'none', brightness: 100, contrast: 100, saturation: 100, aspectRatio: NaN, cropData: null }; initEditor(images[currentIndex].state); } });
 
-exportFormat.addEventListener('change', () => {
-    qualityContainer.classList.toggle('hidden', !(exportFormat.value === 'image/jpeg' || exportFormat.value === 'image/webp'));
-});
+exportFormat.addEventListener('change', () => { qualityContainer.classList.toggle('hidden', !(exportFormat.value === 'image/jpeg' || exportFormat.value === 'image/webp')); });
+rangeQuality.addEventListener('input', () => { rangeQuality.closest('.slider-item').querySelector('.val').textContent = rangeQuality.value + '%'; });
 
-rangeQuality.addEventListener('input', () => {
-    rangeQuality.closest('.slider-item').querySelector('.val').textContent = rangeQuality.value + '%';
-});
-
-// Download Logics
 async function getFinalCanvas(imgItem) {
     const s = imgItem.state;
     let cropData = (imgItem === images[currentIndex] && cropper) ? cropper.getData() : s.cropData;
     if (!cropData) cropData = { x: 0, y: 0, width: imgItem.img.width, height: imgItem.img.height };
-
     const drawCanvas = document.createElement('canvas');
-    drawCanvas.width = cropData.width;
-    drawCanvas.height = cropData.height;
+    drawCanvas.width = cropData.width; drawCanvas.height = cropData.height;
     const dCtx = drawCanvas.getContext('2d');
     dCtx.filter = [getCanvasFilter(s.filter), `brightness(${s.brightness}%)`, `contrast(${s.contrast}%)`, `saturate(${s.saturation}%)`].join(' ');
     dCtx.drawImage(imgItem.img, cropData.x, cropData.y, cropData.width, cropData.height, 0, 0, cropData.width, cropData.height);
@@ -405,7 +394,7 @@ btnDownloadAll.addEventListener('click', async () => {
     link.download = `image-editor-all-${Date.now()}.zip`;
     link.click();
     btnDownloadAll.disabled = false;
-    btnDownloadAll.innerHTML = `<i data-lucide="download"></i> <span data-i18n="download-all">Download All (ZIP)</span>`;
+    btnDownloadAll.innerHTML = `<i data-lucide="download"></i> <span data-i18n="download-all">Download All</span>`;
     if (window.lucide) lucide.createIcons();
     if (window.updateContent) window.updateContent();
 });
