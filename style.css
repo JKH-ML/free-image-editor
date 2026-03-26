@@ -3,19 +3,11 @@
     --fg: #fafafa;
     --card: #18181b;
     --card-fg: #fafafa;
-    --popover: #09090b;
-    --popover-fg: #fafafa;
     --primary: #ffffff;
     --primary-fg: #09090b;
-    --secondary: #27272a;
-    --secondary-fg: #fafafa;
     --muted: #27272a;
     --muted-fg: #a1a1aa;
-    --accent: #27272a;
-    --accent-fg: #fafafa;
     --border: #27272a;
-    --input: #27272a;
-    --ring: #3f3f46;
     --radius: 0.5rem;
 }
 
@@ -47,13 +39,11 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 0 1.5rem;
-    background: var(--bg);
     flex-shrink: 0;
     z-index: 100;
 }
 
-.header-left { display: flex; align-items: center; }
-h1 { font-size: 1.1rem; font-weight: 700; }
+.header-left h1 { font-size: 1.1rem; font-weight: 700; }
 
 .app-select-small {
     background: var(--muted);
@@ -72,27 +62,28 @@ h1 { font-size: 1.1rem; font-weight: 700; }
 /* Container */
 .app-container {
     flex: 1;
-    height: calc(100vh - 60px - 40px); /* Subtract header and footer */
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    position: relative;
 }
 
 /* Landing Page */
 .landing-page {
-    flex: 1;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
     padding: 2rem;
+    overflow-y: auto;
 }
 
 .landing-content {
     max-width: 1000px;
     width: 100%;
-    margin: auto;
     text-align: center;
+    padding: 2rem 0;
 }
 
 .landing-title {
@@ -138,19 +129,46 @@ h1 { font-size: 1.1rem; font-weight: 700; }
     color: var(--primary);
 }
 
-.menu-card:hover .menu-icon {
-    background: var(--primary);
-    color: var(--primary-fg);
-}
-
 .menu-card h3 { font-size: 1.25rem; font-weight: 600; }
 .menu-card p { font-size: 0.9rem; color: var(--muted-fg); line-height: 1.5; }
+
+/* Upload Section */
+.full-screen-drop {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.drop-zone-content {
+    max-width: 500px;
+    width: 100%;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 5rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.drop-zone-content:hover { border-color: var(--primary); background: var(--muted); }
+
+.upload-icon-wrapper {
+    width: 64px; height: 64px;
+    background: var(--muted);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.5rem;
+}
 
 /* Editor Layout */
 .editor-layout {
     display: grid;
     grid-template-columns: 140px 1fr 320px;
     height: 100%;
+    width: 100%;
 }
 
 .sidebar {
@@ -186,7 +204,6 @@ h1 { font-size: 1.1rem; font-weight: 700; }
                       linear-gradient(45deg, transparent 75%, #1a1a1a 75%), 
                       linear-gradient(-45deg, transparent 75%, #1a1a1a 75%);
     background-size: 20px 20px;
-    background-color: #111;
 }
 
 /* Footer */
@@ -205,7 +222,7 @@ h1 { font-size: 1.1rem; font-weight: 700; }
 .full-width { width: 100%; }
 .mt-auto { margin-top: auto; }
 
-/* Controls, Sliders, etc. (Keep existing styles below) */
+/* Control UI Elements */
 .control-section { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
 .section-label { font-size: 0.8rem; font-weight: 600; color: var(--muted-fg); text-transform: uppercase; }
 .slider-item { display: flex; flex-direction: column; gap: 0.4rem; }
@@ -222,3 +239,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14p
 .btn-secondary { background: var(--secondary); color: var(--secondary-fg); border: none; padding: 0.5rem 0.8rem; border-radius: var(--radius); cursor: pointer; display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; }
 .icon-btn, .icon-btn-outline { background: transparent; border: 1px solid var(--border); color: var(--fg); padding: 0.5rem; border-radius: var(--radius); cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .toolbar-top { height: 50px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 1rem; gap: 0.5rem; background: var(--bg); flex-shrink: 0; }
+.thumbnail-item { aspect-ratio: 1; border-radius: var(--radius); border: 2px solid transparent; overflow: hidden; cursor: pointer; background: #000; transition: all 0.2s; flex-shrink: 0; }
+.thumbnail-item img { width: 100%; height: 100%; object-fit: cover; }
+.thumbnail-item.active { border-color: var(--primary); box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--primary); }
+.queue-list { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }

@@ -44,8 +44,6 @@ const menuCards = document.querySelectorAll('.menu-card');
 // Handle Menu Card Selection
 menuCards.forEach(card => {
     card.addEventListener('click', () => {
-        const mode = card.dataset.mode;
-        // mode logic can be used here to pre-set configurations
         landingSection.classList.add('hidden');
         uploadSection.classList.remove('hidden');
     });
@@ -77,7 +75,7 @@ async function handleFiles(files) {
     }
     uploadSection.classList.add('hidden');
     editorSection.classList.remove('hidden');
-    lucide.createIcons();
+    if (window.lucide) lucide.createIcons();
 }
 
 function addImage(file) {
@@ -357,7 +355,7 @@ btnDownloadAll.addEventListener('click', async () => {
     link.download = `image-editor-all-${Date.now()}.zip`;
     link.click();
     btnDownloadAll.disabled = false;
-    btnDownloadAll.innerHTML = `<i data-lucide="download"></i> <span>Download All (ZIP)</span>`;
-    lucide.createIcons();
-    updateContent();
+    btnDownloadAll.innerHTML = `<i data-lucide="download"></i> <span data-i18n="download-all">Download All (ZIP)</span>`;
+    if (window.lucide) lucide.createIcons();
+    if (window.updateContent) window.updateContent();
 });

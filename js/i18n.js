@@ -135,14 +135,14 @@ const translations = {
         "menu-batch-title": "一괄変換",
         "menu-batch-desc": "複数の画像を変換してZIPで書き出し",
         "menu-full-title": "統合エディタ",
-        "menu-full-desc": "すべての編集ツールを自由に使用",
+        "menu-full-desc": "すべての編集ツール를 자유롭게 사용",
         "point1": "完全無料",
         "point2": "オープンソース",
         "point3": "登録不要",
         "drop-text": "画像をドラッグ＆ドロップするか、クリックしてアップロード",
         "queue-title": "画像リスト",
         "copy-settings": "設定をコピー",
-        "paste-settings": "設定를 貼り付け",
+        "paste-settings": "設定を貼り付け",
         "transform": "変換",
         "adjust": "調整",
         "brightness": "明るさ",
@@ -165,22 +165,20 @@ const translations = {
         "undo": "元に戻す",
         "redo": "やり直し",
         "compare": "比較",
-        "privacy-note": "すべての処理はブラウザ内でローカルに行われます. データがサーバーに送信されることはありません。"
+        "privacy-note": "すべての処理はブラウザ内でローカルに行われます。データがサーバーに送信されることはありません。"
     }
 };
 
-// Initialize current language
-let currentLang = localStorage.getItem('lang') || (navigator.language.startsWith('ko') ? 'ko' : navigator.language.startsWith('zh') ? 'zh' : navigator.language.startsWith('ja') ? 'ja' : 'en');
+// Global language state
+window.currentLang = localStorage.getItem('lang') || (navigator.language.startsWith('ko') ? 'ko' : navigator.language.startsWith('zh') ? 'zh' : navigator.language.startsWith('ja') ? 'ja' : 'en');
 
-// Fallback to 'en' if the currentLang is not valid in translations
-if (!translations[currentLang]) {
-    currentLang = 'en';
+if (!translations[window.currentLang]) {
+    window.currentLang = 'en';
 }
 
 function updateContent() {
-    const langData = translations[currentLang] || translations.en;
+    const langData = translations[window.currentLang] || translations.en;
     
-    // Update all text content
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (langData[key]) {
@@ -188,7 +186,6 @@ function updateContent() {
         }
     });
 
-    // Update all title attributes
     document.querySelectorAll('[data-i18n-title]').forEach(el => {
         const key = el.getAttribute('data-i18n-title');
         if (langData[key]) {
@@ -196,27 +193,22 @@ function updateContent() {
         }
     });
 
-    document.documentElement.lang = currentLang;
+    document.documentElement.lang = window.currentLang;
     
-    // Sync the select dropdown value if it exists
     const select = document.getElementById('language-select');
-    if (select) {
-        select.value = currentLang;
-    }
+    if (select) select.value = window.currentLang;
 }
 
-// Attach to window so other scripts can call it if needed
 window.updateContent = updateContent;
 
-// Initialize on DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
     updateContent();
     
     const select = document.getElementById('language-select');
     if (select) {
         select.addEventListener('change', (e) => {
-            currentLang = e.target.value;
-            localStorage.setItem('lang', currentLang);
+            window.currentLang = e.target.value;
+            localStorage.setItem('lang', window.currentLang);
             updateContent();
         });
     }
