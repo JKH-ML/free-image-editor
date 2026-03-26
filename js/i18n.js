@@ -14,6 +14,8 @@ const translations = {
         "contrast": "대비",
         "saturation": "채도",
         "quality": "품질",
+        "aspect-ratio": "자르기 비율",
+        "ratio-free": "자유",
         "resize": "크기 조절",
         "filters": "필터",
         "filter-none": "원본",
@@ -41,6 +43,8 @@ const translations = {
         "contrast": "Contrast",
         "saturation": "Saturation",
         "quality": "Quality",
+        "aspect-ratio": "Aspect Ratio",
+        "ratio-free": "Free",
         "resize": "Resize",
         "filters": "Filters",
         "filter-none": "None",
@@ -68,6 +72,8 @@ const translations = {
         "contrast": "对比度",
         "saturation": "饱和度",
         "quality": "质量",
+        "aspect-ratio": "裁剪比例",
+        "ratio-free": "自由",
         "resize": "调整大小",
         "filters": "滤镜",
         "filter-none": "原图",
@@ -87,7 +93,7 @@ const translations = {
         "point3": "登録不要",
         "point4": "広告なし",
         "point5": "ウォーターマークなし",
-        "point6": "데이터 수집 없음",
+        "point6": "データ収集なし",
         "drop-text": "画像をドラッグ＆ドロップするか、クリックしてアップロードしてください",
         "transform": "変換",
         "adjust": "調整",
@@ -95,6 +101,8 @@ const translations = {
         "contrast": "コントラスト",
         "saturation": "彩度",
         "quality": "画質",
+        "aspect-ratio": "切り抜き比率",
+        "ratio-free": "自由",
         "resize": "サイズ変更",
         "filters": "フィルター",
         "filter-none": "元画像",
@@ -105,7 +113,7 @@ const translations = {
         "format": "書き出し設定",
         "download": "ダウンロード",
         "reset": "リセット",
-        "privacy-note": "すべての処理はブラウザ内でローカルに行われます。데이터가 서버에 送信されることはありません。"
+        "privacy-note": "すべての処理はブラウザ内でローカルに行われます。データがサーバーに送信されることはありません。"
     }
 };
 

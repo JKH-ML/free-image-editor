@@ -6,6 +6,9 @@
     <title>Image Cut - Unlimited Free Image Editor</title>
     <meta name="description" content="Unlimited Free + Open Source. No Signup · No Ads · No Watermarks · No Data Collection. Simple and powerful image editor in your browser.">
     <link rel="stylesheet" href="style.css">
+    <!-- Cropper.js for professional cropping -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <!-- COI Service Worker for SharedArrayBuffer support on GitHub Pages -->
     <script src="js/coi-serviceworker.js"></script>
 </head>
@@ -44,6 +47,17 @@
                 </div>
                 
                 <aside class="controls card">
+                    <div class="control-group">
+                        <label data-i18n="aspect-ratio">자르기 비율</label>
+                        <div class="ratio-grid">
+                            <button class="ratio-btn active" data-ratio="NaN" data-i18n="ratio-free">자유</button>
+                            <button class="ratio-btn" data-ratio="1">1:1</button>
+                            <button class="ratio-btn" data-ratio="0.8">4:5</button>
+                            <button class="ratio-btn" data-ratio="1.777">16:9</button>
+                            <button class="ratio-btn" data-ratio="0.562">9:16</button>
+                        </div>
+                    </div>
+
                     <div class="control-group">
                         <label data-i18n="transform">변환</label>
                         <div class="button-row">
