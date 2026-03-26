@@ -1,4 +1,4 @@
-# 🖼️ IMAGE-CUT
+# 🖼️ IMAGE-EDITOR
 
 Fast, Private, and Browser-based Image Editor.
 
@@ -7,7 +7,7 @@ Fast, Private, and Browser-based Image Editor.
 
 [English](./README.md) | [한국어](./README.ko.md) | [简体中文](./README.zh.md) | [日本語](./README.ja.md)
 
-IMAGE-CUT is a high-performance image editing tool that runs instantly in the browser without server uploads. Powered by the Canvas API and WebAssembly, all image processing happens locally on your device, ensuring fast and secure editing without data leakage.
+IMAGE-EDITOR is a high-performance image editing tool that runs instantly in the browser without server uploads. Powered by the Canvas API and WebAssembly, all image processing happens locally on your device, ensuring fast and secure editing without data leakage.
 
 ---
 

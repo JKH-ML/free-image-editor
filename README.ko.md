@@ -1,4 +1,4 @@
-# 🖼️ IMAGE-CUT
+# 🖼️ IMAGE-EDITOR
 
 빠르고 안전한 브라우저 기반 이미지 에디터.
 
@@ -7,7 +7,7 @@
 
 [English](./README.md) | [한국어](./README.ko.md) | [简体中文](./README.zh.md) | [日本語](./README.ja.md)
 
-IMAGE-CUT은 서버 업로드 없이 브라우저에서 즉시 실행되는 고성능 이미지 편집 도구입니다. Canvas API와 WebAssembly를 기반으로 모든 이미지 처리가 사용자의 기기에서 로컬로 수행되어, 데이터 유출 걱정 없이 빠르고 안전한 편집이 가능합니다.
+IMAGE-EDITOR는 서버 업로드 없이 브라우저에서 즉시 실행되는 고성능 이미지 편집 도구입니다. Canvas API와 WebAssembly를 기반으로 모든 이미지 처리가 사용자의 기기에서 로컬로 수행되어, 데이터 유출 걱정 없이 빠르고 안전한 편집이 가능합니다.
 
 ---
 

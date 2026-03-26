@@ -1,4 +1,4 @@
-# 🖼️ IMAGE-CUT
+# 🖼️ IMAGE-EDITOR
 
 快速、私密且基于浏览器的图片编辑器。
 
@@ -7,7 +7,7 @@
 
 [English](./README.md) | [한국어](./README.ko.md) | [简体中文](./README.zh.md) | [日本語](./README.ja.md)
 
-IMAGE-CUT 是一款高性能的图片编辑工具，可直接在浏览器中运行，无需上传到服务器。基于 Canvas API 和 WebAssembly，所有图片处理都在您的设备本地完成，确保快速、安全的编辑，无数据泄露。
+IMAGE-EDITOR 是一款高性能的图片编辑工具，可直接在浏览器中运行，无需上传到服务器。基于 Canvas API 和 WebAssembly，所有图片处理都在您的设备本地完成，确保快速、安全的编辑，无数据泄露。
 
 ---
 

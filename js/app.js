@@ -351,7 +351,7 @@ btnDownload.addEventListener('click', async () => {
 
     const finalCanvas = await getFinalCanvas(images[currentIndex]);
     const link = document.createElement('a');
-    link.download = `image-cut-${Date.now()}.${format.split('/')[1]}`;
+    link.download = `image-editor-${Date.now()}.${format.split('/')[1]}`;
     link.href = finalCanvas.toDataURL(format, quality);
     link.click();
 });

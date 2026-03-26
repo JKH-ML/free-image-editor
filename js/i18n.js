@@ -1,6 +1,6 @@
 const translations = {
     ko: {
-        "title": "이미지 컷 (Image Cut)",
+        "title": "이미지 에디터 (Image Editor)",
         "point1": "무제한 무료",
         "point2": "오픈 소스",
         "point3": "가입 불필요",
@@ -36,7 +36,7 @@ const translations = {
         "privacy-note": "모든 처리는 브라우저에서 로컬로 수행됩니다. 데이터는 서버로 전송되지 않습니다."
     },
     en: {
-        "title": "Image Cut",
+        "title": "Image Editor",
         "point1": "Unlimited Free",
         "point2": "Open Source",
         "point3": "No Signup",
@@ -72,7 +72,7 @@ const translations = {
         "privacy-note": "All processing is done locally in your browser. No data is sent to any server."
     },
     zh: {
-        "title": "Image Cut (图片裁剪)",
+        "title": "Image Editor (图片编辑器)",
         "point1": "无限免费",
         "point2": "开源项目",
         "point3": "无需注册",
@@ -108,7 +108,7 @@ const translations = {
         "privacy-note": "所有处理均在您的浏览器中本地完成。数据不会发送到任何服务器。"
     },
     ja: {
-        "title": "Image Cut (画像編集)",
+        "title": "Image Editor (画像編集)",
         "point1": "完全無料",
         "point2": "オープンソース",
         "point3": "登録不要",
@@ -141,7 +141,7 @@ const translations = {
         "undo": "元に戻す",
         "redo": "やり直し",
         "compare": "比較",
-        "privacy-note": "すべての処理はブラウザ内でローカルに行われます。데이터가 서버에 送信되는ことはありません。"
+        "privacy-note": "すべての処理はブラウザ内でローカルに行われます. データがサーバーに送信されることはありません。"
     }
 };
 
