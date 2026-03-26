@@ -9,6 +9,8 @@
     <!-- Cropper.js for professional cropping -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <!-- JSZip for Download All as ZIP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <!-- COI Service Worker for SharedArrayBuffer support on GitHub Pages -->
     <script src="js/coi-serviceworker.js"></script>
 </head>
@@ -48,6 +50,9 @@
                         <button id="btn-add-more">+</button>
                     </div>
                     <div id="thumbnail-list"></div>
+                    <button id="btn-download-all" class="secondary-btn" style="margin-top: auto; font-size: 0.75rem;">
+                        <span data-i18n="download-all">전체 다운로드 (ZIP)</span>
+                    </button>
                 </aside>
 
                 <div class="canvas-container card">

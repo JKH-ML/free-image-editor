@@ -28,6 +28,7 @@ const translations = {
         "filter-blur": "흐림",
         "format": "내보내기 설정",
         "download": "다운로드",
+        "download-all": "전체 다운로드 (ZIP)",
         "reset": "초기화",
         "undo": "실행 취소",
         "redo": "다시 실행",
@@ -63,6 +64,7 @@ const translations = {
         "filter-blur": "Blur",
         "format": "Export Settings",
         "download": "Download",
+        "download-all": "Download All (ZIP)",
         "reset": "Reset",
         "undo": "Undo",
         "redo": "Redo",
@@ -98,6 +100,7 @@ const translations = {
         "filter-blur": "模糊",
         "format": "导出设置",
         "download": "下载",
+        "download-all": "全部下载 (ZIP)",
         "reset": "重置",
         "undo": "撤回",
         "redo": "重做",
@@ -133,11 +136,12 @@ const translations = {
         "filter-blur": "ぼかし",
         "format": "書き出し設定",
         "download": "ダウンロード",
+        "download-all": "一括ダウンロード (ZIP)",
         "reset": "リセット",
         "undo": "元に戻す",
         "redo": "やり直し",
         "compare": "比較",
-        "privacy-note": "すべての処理はブラウザ内でローカルに行われます。データがサーバーに送信されることはありません。"
+        "privacy-note": "すべての処理はブラウザ内でローカルに行われます。데이터가 서버에 送信되는ことはありません。"
     }
 };
 
