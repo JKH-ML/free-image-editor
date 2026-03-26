@@ -7,7 +7,10 @@ const translations = {
         "point4": "광고 없음",
         "point5": "워터마크 없음",
         "point6": "데이터 수집 없음",
-        "drop-text": "이미지를 드래그하거나 클릭하여 업로드하세요",
+        "drop-text": "이미지들을 드래그하거나 클릭하여 업로드하세요 (여러 장 가능)",
+        "queue-title": "이미지 목록",
+        "copy-settings": "설정 복사",
+        "paste-settings": "설정 붙여넣기",
         "transform": "변환",
         "adjust": "보정",
         "brightness": "밝기",
@@ -39,7 +42,10 @@ const translations = {
         "point4": "No Ads",
         "point5": "No Watermarks",
         "point6": "No Data Collection",
-        "drop-text": "Drag and drop or click to upload an image",
+        "drop-text": "Drag and drop or click to upload images (Multiple files allowed)",
+        "queue-title": "Images",
+        "copy-settings": "Copy Settings",
+        "paste-settings": "Paste Settings",
         "transform": "Transform",
         "adjust": "Adjust",
         "brightness": "Brightness",
@@ -71,7 +77,10 @@ const translations = {
         "point4": "无广告",
         "point5": "无水印",
         "point6": "无数据收集",
-        "drop-text": "拖放或点击上传图片",
+        "drop-text": "拖放或点击上传图片 (支持多张)",
+        "queue-title": "图片列表",
+        "copy-settings": "复制设置",
+        "paste-settings": "粘贴设置",
         "transform": "变换",
         "adjust": "调整",
         "brightness": "亮度",
@@ -103,7 +112,10 @@ const translations = {
         "point4": "広告なし",
         "point5": "ウォーターマークなし",
         "point6": "データ収集なし",
-        "drop-text": "画像をドラッグ＆ドロップするか、クリックしてアップロードしてください",
+        "drop-text": "画像をドラッグ＆ドロップするか、クリックしてアップロードしてください (複数可)",
+        "queue-title": "画像リスト",
+        "copy-settings": "設定をコピー",
+        "paste-settings": "設定を貼り付け",
         "transform": "変換",
         "adjust": "調整",
         "brightness": "明るさ",
@@ -115,7 +127,7 @@ const translations = {
         "resize": "サイズ変更",
         "filters": "フィルター",
         "filter-none": "元画像",
-        "filter-gray": "グレース케ール",
+        "filter-gray": "グレースケール",
         "filter-sepia": "セピア",
         "filter-invert": "反転",
         "filter-blur": "ぼかし",
@@ -128,3 +140,40 @@ const translations = {
         "privacy-note": "すべての処理はブラウザ内でローカルに行われます。データがサーバーに送信されることはありません。"
     }
 };
+
+let currentLang = localStorage.getItem('lang') || (navigator.language.startsWith('ko') ? 'ko' : navigator.language.startsWith('zh') ? 'zh' : navigator.language.startsWith('ja') ? 'ja' : 'en');
+
+function updateContent() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = translations[currentLang][key];
+    });
+    document.documentElement.lang = currentLang;
+}
+
+document.getElementById('btn-ko').addEventListener('click', () => {
+    currentLang = 'ko';
+    localStorage.setItem('lang', 'ko');
+    updateContent();
+});
+
+document.getElementById('btn-en').addEventListener('click', () => {
+    currentLang = 'en';
+    localStorage.setItem('lang', 'en');
+    updateContent();
+});
+
+document.getElementById('btn-zh').addEventListener('click', () => {
+    currentLang = 'zh';
+    localStorage.setItem('lang', 'zh');
+    updateContent();
+});
+
+document.getElementById('btn-ja').addEventListener('click', () => {
+    currentLang = 'ja';
+    localStorage.setItem('lang', 'ja');
+    updateContent();
+});
+
+// Initial update
+updateContent();

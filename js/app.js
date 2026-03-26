@@ -4,6 +4,8 @@ const uploadSection = document.getElementById('upload-section');
 const editorSection = document.getElementById('editor-section');
 const canvas = document.getElementById('main-canvas');
 const ctx = canvas.getContext('2d');
+const thumbnailList = document.getElementById('thumbnail-list');
+const btnAddMore = document.getElementById('btn-add-more');
 
 const inputWidth = document.getElementById('input-width');
 const inputHeight = document.getElementById('input-height');
@@ -31,77 +33,120 @@ const btnZoomIn = document.getElementById('btn-zoom-in');
 const btnZoomOut = document.getElementById('btn-zoom-out');
 const btnZoomReset = document.getElementById('btn-zoom-reset');
 
-let originalImage = null;
-let cropper = null;
-let state = {
-    filter: 'none',
-    brightness: 100,
-    contrast: 100,
-    saturation: 100,
-    aspectRatio: NaN,
-    cropData: null
-};
+const btnCopySettings = document.getElementById('btn-copy-settings');
+const btnPasteSettings = document.getElementById('btn-paste-settings');
 
-let undoStack = [];
-let redoStack = [];
+let images = []; // Array of { file, img, state, undoStack, redoStack }
+let currentIndex = -1;
+let cropper = null;
 let isComparing = false;
+let copiedSettings = null;
 
 // Handle Upload
 dropZone.addEventListener('click', () => fileInput.click());
+btnAddMore.addEventListener('click', () => fileInput.click());
+
 dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
 dropZone.addEventListener('drop', (e) => {
     e.preventDefault();
     dropZone.classList.remove('dragover');
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) loadImage(file);
+    handleFiles(e.dataTransfer.files);
 });
 fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) loadImage(file);
+    handleFiles(e.target.files);
 });
 
-function loadImage(file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-            originalImage = img;
-            undoStack = [];
-            redoStack = [];
-            initEditor();
-            uploadSection.classList.add('hidden');
-            editorSection.classList.remove('hidden');
-        };
-        img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
+async function handleFiles(files) {
+    for (const file of files) {
+        if (file.type.startsWith('image/')) {
+            await addImage(file);
+        }
+    }
+    if (currentIndex === -1 && images.length > 0) {
+        switchImage(0);
+    }
+    uploadSection.classList.add('hidden');
+    editorSection.classList.remove('hidden');
 }
 
-function initEditor(savedState = null) {
+function addImage(file) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                images.push({
+                    file: file,
+                    img: img,
+                    state: getDefaultState(),
+                    undoStack: [],
+                    redoStack: []
+                });
+                renderThumbnails();
+                resolve();
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function getDefaultState() {
+    return {
+        filter: 'none',
+        brightness: 100,
+        contrast: 100,
+        saturation: 100,
+        aspectRatio: NaN,
+        cropData: null
+    };
+}
+
+function renderThumbnails() {
+    thumbnailList.innerHTML = '';
+    images.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = `thumbnail-item ${index === currentIndex ? 'active' : ''}`;
+        div.innerHTML = `<img src="${item.img.src}">`;
+        div.onclick = () => switchImage(index);
+        thumbnailList.appendChild(div);
+    });
+}
+
+function switchImage(index) {
+    if (currentIndex === index) return;
+    
+    // Save current crop data to state before switching
+    if (currentIndex !== -1 && cropper) {
+        images[currentIndex].state.cropData = cropper.getData();
+    }
+
+    currentIndex = index;
+    renderThumbnails();
+    initEditor(images[currentIndex].state);
+}
+
+function initEditor(savedState) {
     if (cropper) cropper.destroy();
     
-    if (savedState) {
-        state = JSON.parse(JSON.stringify(savedState));
-    } else {
-        resetState();
-    }
+    const currentItem = images[currentIndex];
+    currentItem.state = JSON.parse(JSON.stringify(savedState));
     
     updateUIFromState();
 
     const tempImg = new Image();
-    tempImg.src = originalImage.src;
-    tempImg.id = 'cropper-target';
+    tempImg.src = currentItem.img.src;
     
     const container = document.querySelector('.canvas-container');
     container.innerHTML = '';
     container.appendChild(tempImg);
 
     cropper = new Cropper(tempImg, {
-        aspectRatio: state.aspectRatio,
+        aspectRatio: currentItem.state.aspectRatio,
         viewMode: 1,
         autoCropArea: 1,
-        data: state.cropData,
+        data: currentItem.state.cropData,
         ready() {
             renderToCanvas();
         },
@@ -115,42 +160,42 @@ function initEditor(savedState = null) {
     });
 }
 
-function resetState() {
-    state = { filter: 'none', brightness: 100, contrast: 100, saturation: 100, aspectRatio: NaN, cropData: null };
-}
-
 function updateUIFromState() {
-    rangeBrightness.value = state.brightness;
-    rangeContrast.value = state.contrast;
-    rangeSaturation.value = state.saturation;
+    const s = images[currentIndex].state;
+    rangeBrightness.value = s.brightness;
+    rangeContrast.value = s.contrast;
+    rangeSaturation.value = s.saturation;
     ratioBtns.forEach(btn => btn.classList.toggle('active', 
-        (isNaN(state.aspectRatio) && btn.dataset.ratio === 'NaN') || 
-        (parseFloat(btn.dataset.ratio) === state.aspectRatio)
+        (isNaN(s.aspectRatio) && btn.dataset.ratio === 'NaN') || 
+        (parseFloat(btn.dataset.ratio) === s.aspectRatio)
     ));
     updateHistoryButtons();
 }
 
 function saveHistory() {
-    const currentState = JSON.parse(JSON.stringify(state));
+    const item = images[currentIndex];
+    const currentState = JSON.parse(JSON.stringify(item.state));
     if (cropper) currentState.cropData = cropper.getData();
     
-    if (undoStack.length > 0) {
-        const last = undoStack[undoStack.length - 1];
+    if (item.undoStack.length > 0) {
+        const last = item.undoStack[item.undoStack.length - 1];
         if (JSON.stringify(last) === JSON.stringify(currentState)) return;
     }
 
-    undoStack.push(currentState);
-    redoStack = [];
+    item.undoStack.push(currentState);
+    item.redoStack = [];
     updateHistoryButtons();
 }
 
 function updateHistoryButtons() {
-    btnUndo.disabled = undoStack.length === 0;
-    btnRedo.disabled = redoStack.length === 0;
+    if (currentIndex === -1) return;
+    const item = images[currentIndex];
+    btnUndo.disabled = item.undoStack.length === 0;
+    btnRedo.disabled = item.redoStack.length === 0;
 }
 
 function renderToCanvas() {
-    if (!cropper) return;
+    if (!cropper || currentIndex === -1) return;
 
     const croppedCanvas = isComparing ? getOriginalCroppedCanvas() : cropper.getCroppedCanvas();
     if (!croppedCanvas) return;
@@ -163,11 +208,12 @@ function renderToCanvas() {
 
     ctx.save();
     if (!isComparing) {
+        const s = images[currentIndex].state;
         const filters = [
-            getCanvasFilter(state.filter),
-            `brightness(${state.brightness}%)`,
-            `contrast(${state.contrast}%)`,
-            `saturate(${state.saturation}%)`
+            getCanvasFilter(s.filter),
+            `brightness(${s.brightness}%)`,
+            `contrast(${s.contrast}%)`,
+            `saturate(${s.saturation}%)`
         ].join(' ');
         ctx.filter = filters;
     }
@@ -177,7 +223,6 @@ function renderToCanvas() {
 }
 
 function getOriginalCroppedCanvas() {
-    // To show original without filters, we need a clean crop from originalImage
     const data = cropper.getData();
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = data.width;
@@ -185,7 +230,7 @@ function getOriginalCroppedCanvas() {
     const tempCtx = tempCanvas.getContext('2d');
     
     tempCtx.drawImage(
-        originalImage,
+        images[currentIndex].img,
         data.x, data.y, data.width, data.height,
         0, 0, data.width, data.height
     );
@@ -202,56 +247,62 @@ function getCanvasFilter(filter) {
     }
 }
 
+// Settings Copy/Paste
+btnCopySettings.addEventListener('click', () => {
+    const s = images[currentIndex].state;
+    copiedSettings = {
+        filter: s.filter,
+        brightness: s.brightness,
+        contrast: s.contrast,
+        saturation: s.saturation
+    };
+    btnPasteSettings.disabled = false;
+});
+
+btnPasteSettings.addEventListener('click', () => {
+    if (!copiedSettings) return;
+    saveHistory();
+    const s = images[currentIndex].state;
+    Object.assign(s, copiedSettings);
+    updateUIFromState();
+    renderToCanvas();
+});
+
 // Compare & Zoom Controls
-btnCompare.addEventListener('mousedown', () => {
-    isComparing = true;
-    btnCompare.classList.add('active');
-    renderToCanvas();
-});
-
-btnCompare.addEventListener('mouseup', () => {
-    isComparing = false;
-    btnCompare.classList.remove('active');
-    renderToCanvas();
-});
-
-btnCompare.addEventListener('mouseleave', () => {
-    if (isComparing) {
-        isComparing = false;
-        btnCompare.classList.remove('active');
-        renderToCanvas();
-    }
-});
-
+btnCompare.addEventListener('mousedown', () => { isComparing = true; btnCompare.classList.add('active'); renderToCanvas(); });
+btnCompare.addEventListener('mouseup', () => { isComparing = false; btnCompare.classList.remove('active'); renderToCanvas(); });
+btnCompare.addEventListener('mouseleave', () => { if (isComparing) { isComparing = false; btnCompare.classList.remove('active'); renderToCanvas(); } });
 btnZoomIn.addEventListener('click', () => { cropper.zoom(0.1); renderToCanvas(); });
 btnZoomOut.addEventListener('click', () => { cropper.zoom(-0.1); renderToCanvas(); });
 btnZoomReset.addEventListener('click', () => { cropper.reset(); renderToCanvas(); });
 
 // History Controls
 btnUndo.addEventListener('click', () => {
-    if (undoStack.length === 0) return;
-    const current = JSON.parse(JSON.stringify(state));
+    const item = images[currentIndex];
+    if (item.undoStack.length === 0) return;
+    const current = JSON.parse(JSON.stringify(item.state));
     if (cropper) current.cropData = cropper.getData();
-    redoStack.push(current);
-    const prevState = undoStack.pop();
+    item.redoStack.push(current);
+    const prevState = item.undoStack.pop();
     applyState(prevState);
 });
 
 btnRedo.addEventListener('click', () => {
-    if (redoStack.length === 0) return;
-    const current = JSON.parse(JSON.stringify(state));
+    const item = images[currentIndex];
+    if (item.redoStack.length === 0) return;
+    const current = JSON.parse(JSON.stringify(item.state));
     if (cropper) current.cropData = cropper.getData();
-    undoStack.push(current);
-    const nextState = redoStack.pop();
+    item.undoStack.push(current);
+    const nextState = item.redoStack.pop();
     applyState(nextState);
 });
 
 function applyState(targetState) {
-    state = JSON.parse(JSON.stringify(targetState));
+    images[currentIndex].state = JSON.parse(JSON.stringify(targetState));
     updateUIFromState();
     if (cropper) {
-        cropper.setAspectRatio(state.aspectRatio);
-        cropper.setData(state.cropData);
+        cropper.setAspectRatio(images[currentIndex].state.aspectRatio);
+        cropper.setData(images[currentIndex].state.cropData);
     }
     renderToCanvas();
 }
@@ -260,9 +311,10 @@ function applyState(targetState) {
 [rangeBrightness, rangeContrast, rangeSaturation].forEach(el => {
     el.addEventListener('change', () => { saveHistory(); });
     el.addEventListener('input', () => {
-        state.brightness = rangeBrightness.value;
-        state.contrast = rangeContrast.value;
-        state.saturation = rangeSaturation.value;
+        const s = images[currentIndex].state;
+        s.brightness = rangeBrightness.value;
+        s.contrast = rangeContrast.value;
+        s.saturation = rangeSaturation.value;
         renderToCanvas();
     });
 });
@@ -270,7 +322,7 @@ function applyState(targetState) {
 filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         saveHistory();
-        state.filter = btn.getAttribute('data-filter');
+        images[currentIndex].state.filter = btn.getAttribute('data-filter');
         renderToCanvas();
     });
 });
@@ -280,8 +332,8 @@ ratioBtns.forEach(btn => {
         saveHistory();
         ratioBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        state.aspectRatio = parseFloat(btn.dataset.ratio);
-        cropper.setAspectRatio(state.aspectRatio);
+        images[currentIndex].state.aspectRatio = parseFloat(btn.dataset.ratio);
+        cropper.setAspectRatio(images[currentIndex].state.aspectRatio);
     });
 });
 
@@ -290,9 +342,9 @@ btnFlipH.addEventListener('click', () => { saveHistory(); cropper.scaleX(cropper
 btnFlipV.addEventListener('click', () => { saveHistory(); cropper.scaleY(cropper.getData().scaleY * -1); renderToCanvas(); });
 
 btnReset.addEventListener('click', () => {
-    if (!originalImage) return;
+    if (currentIndex === -1) return;
     saveHistory();
-    initEditor();
+    initEditor(getDefaultState());
 });
 
 exportFormat.addEventListener('change', () => {

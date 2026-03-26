@@ -35,18 +35,33 @@
     <main class="container">
         <section id="upload-section" class="card">
             <div id="drop-zone">
-                <p data-i18n="drop-text">이미지를 드래그하거나 클릭하여 업로드하세요</p>
-                <input type="file" id="file-input" accept="image/*" hidden>
+                <p data-i18n="drop-text">이미지들을 드래그하거나 클릭하여 업로드하세요 (여러 장 가능)</p>
+                <input type="file" id="file-input" accept="image/*" multiple hidden>
             </div>
         </section>
 
         <section id="editor-section" class="hidden">
             <div class="editor-layout">
+                <aside id="image-queue" class="card">
+                    <div class="queue-header">
+                        <span data-i18n="queue-title">목록</span>
+                        <button id="btn-add-more">+</button>
+                    </div>
+                    <div id="thumbnail-list"></div>
+                </aside>
+
                 <div class="canvas-container card">
                     <canvas id="main-canvas"></canvas>
                 </div>
                 
                 <aside class="controls card">
+                    <div class="control-group">
+                        <div class="button-row">
+                            <button id="btn-copy-settings" title="Copy Settings"><span data-i18n="copy-settings">설정 복사</span></button>
+                            <button id="btn-paste-settings" title="Paste Settings" disabled><span data-i18n="paste-settings">설정 붙여넣기</span></button>
+                        </div>
+                    </div>
+                    
                     <div class="control-group">
                         <div class="button-row">
                             <button id="btn-undo" title="Undo" disabled>↩ <span data-i18n="undo">실행 취소</span></button>
