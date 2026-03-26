@@ -2,7 +2,7 @@
 
 Fast, Private, and Browser-based Image Editor.
 
-> Unlimited Free + Open Source
+> Unlimited Free + Open Source  
 > No Signup · No Ads · No Watermarks · No Data Collection
 
 [English](./README.md) | [한국어](./README.ko.md) | [简体中文](./README.zh.md) | [日本語](./README.ja.md)
