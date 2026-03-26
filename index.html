@@ -3,177 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Editor - Unlimited Free Image Editor</title>
-    <meta name="description" content="Unlimited Free + Open Source. No Signup · No Ads · No Watermarks · No Data Collection. Simple and powerful image editor in your browser.">
+    <title>Image Editor - Fast & Private</title>
+    <meta name="description" content="Unlimited Free + Open Source. No Signup · No Ads · No Watermarks · No Data Collection.">
     <link rel="stylesheet" href="style.css">
-    <!-- Cropper.js for professional cropping -->
+    <!-- Cropper.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-    <!-- JSZip for Download All as ZIP -->
+    <!-- JSZip -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <!-- COI Service Worker for SharedArrayBuffer support on GitHub Pages -->
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- COI Service Worker -->
     <script src="coi-serviceworker.js"></script>
 </head>
 <body class="dark-theme">
-    <header>
-        <div class="container">
-            <h1 data-i18n="title">Image Cut</h1>
-            <nav>
-                <div class="marketing-points">
-                    <span data-i18n="point1">Unlimited Free</span> + <span data-i18n="point2">Open Source</span><br>
-                    <span data-i18n="point3">No Signup</span> · <span data-i18n="point4">No Ads</span> · 
-                    <span data-i18n="point5">No Watermarks</span> · <span data-i18n="point6">No Data Collection</span>
-                </div>
-                <div class="lang-switcher">
-                    <button id="btn-en">EN</button>
-                    <button id="btn-ko">KO</button>
-                    <button id="btn-zh">CN</button>
-                    <button id="btn-ja">JP</button>
-                </div>
-            </nav>
+    <header class="app-header">
+        <div class="header-left">
+            <h1 data-i18n="title">Image Editor</h1>
+            <div class="marketing-badges">
+                <span class="badge" data-i18n="point1">Unlimited Free</span>
+                <span class="badge" data-i18n="point2">Open Source</span>
+                <span class="badge" data-i18n="point3">No Signup</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="lang-switcher">
+                <button id="btn-en">EN</button>
+                <button id="btn-ko">KO</button>
+                <button id="btn-zh">CN</button>
+                <button id="btn-ja">JP</button>
+            </div>
+            <a href="https://github.com/JKH-ML/free-image-editor" target="_blank" class="github-link">
+                <i data-lucide="github"></i>
+            </a>
         </div>
     </header>
 
-    <main class="container">
-        <section id="upload-section" class="card">
-            <div id="drop-zone">
-                <p data-i18n="drop-text">이미지들을 드래그하거나 클릭하여 업로드하세요 (여러 장 가능)</p>
+    <main class="app-container">
+        <!-- Initial Upload State -->
+        <section id="upload-section" class="full-screen-drop">
+            <div id="drop-zone" class="drop-zone-content">
+                <div class="upload-icon-wrapper">
+                    <i data-lucide="upload-cloud" class="upload-icon"></i>
+                </div>
+                <h2 data-i18n="drop-text">Drag & drop images or click to upload</h2>
+                <p class="upload-subtext">Supports PNG, JPG, WebP, GIF (Local processing only)</p>
                 <input type="file" id="file-input" accept="image/*" multiple hidden>
             </div>
         </section>
 
-        <section id="editor-section" class="hidden">
-            <div class="editor-layout">
-                <aside id="image-queue" class="card">
-                    <div class="queue-header">
-                        <span data-i18n="queue-title">목록</span>
-                        <button id="btn-add-more">+</button>
-                    </div>
-                    <div id="thumbnail-list"></div>
-                    <button id="btn-download-all" class="secondary-btn" style="margin-top: auto; font-size: 0.75rem;">
-                        <span data-i18n="download-all">전체 다운로드 (ZIP)</span>
+        <!-- Editor State -->
+        <section id="editor-section" class="editor-layout hidden">
+            <!-- Left: Image Queue -->
+            <aside id="image-queue" class="sidebar">
+                <div class="section-header">
+                    <span data-i18n="queue-title">Images</span>
+                    <button id="btn-add-more" class="icon-btn-small" title="Add More">
+                        <i data-lucide="plus"></i>
                     </button>
-                </aside>
+                </div>
+                <div id="thumbnail-list" class="queue-list"></div>
+                <button id="btn-download-all" class="btn-primary full-width mt-auto">
+                    <i data-lucide="download"></i>
+                    <span data-i18n="download-all">Download All (ZIP)</span>
+                </button>
+            </aside>
 
-                <div class="canvas-container card">
-                    <canvas id="main-canvas"></canvas>
+            <!-- Center: Workspace -->
+            <div class="workspace">
+                <div class="toolbar-top">
+                    <div class="tool-group">
+                        <button id="btn-undo" class="icon-btn" title="Undo" data-i18n-title="undo">
+                            <i data-lucide="undo-2"></i>
+                        </button>
+                        <button id="btn-redo" class="icon-btn" title="Redo" data-i18n-title="redo">
+                            <i data-lucide="redo-2"></i>
+                        </button>
+                    </div>
+                    <div class="divider-v"></div>
+                    <div class="tool-group">
+                        <button id="btn-zoom-in" class="icon-btn" title="Zoom In"><i data-lucide="zoom-in"></i></button>
+                        <button id="btn-zoom-out" class="icon-btn" title="Zoom Out"><i data-lucide="zoom-out"></i></button>
+                        <button id="btn-zoom-reset" class="icon-btn" title="Reset Zoom">1:1</button>
+                    </div>
+                    <div class="divider-v"></div>
+                    <button id="btn-compare" class="btn-secondary">
+                        <i data-lucide="eye"></i>
+                        <span data-i18n="compare">Compare</span>
+                    </button>
                 </div>
                 
-                <aside class="controls card">
-                    <div class="control-group">
-                        <div class="button-row">
-                            <button id="btn-copy-settings" title="Copy Settings"><span data-i18n="copy-settings">설정 복사</span></button>
-                            <button id="btn-paste-settings" title="Paste Settings" disabled><span data-i18n="paste-settings">설정 붙여넣기</span></button>
-                        </div>
+                <div class="canvas-wrapper">
+                    <div class="canvas-container checkered-bg">
+                        <canvas id="main-canvas"></canvas>
                     </div>
-                    
-                    <div class="control-group">
-                        <div class="button-row">
-                            <button id="btn-undo" title="Undo" disabled>↩ <span data-i18n="undo">실행 취소</span></button>
-                            <button id="btn-redo" title="Redo" disabled>↪ <span data-i18n="redo">다시 실행</span></button>
-                        </div>
-                    </div>
+                </div>
+            </div>
 
-                    <div class="control-group">
-                        <div class="button-row">
-                            <button id="btn-compare" title="Compare with Original" class="secondary-btn"><span data-i18n="compare">원본 비교</span></button>
-                        </div>
-                        <div class="button-row" style="margin-top: 8px;">
-                            <button id="btn-zoom-in" title="Zoom In">+</button>
-                            <button id="btn-zoom-out" title="Zoom Out">-</button>
-                            <button id="btn-zoom-reset" title="Reset Zoom">1:1</button>
-                        </div>
+            <!-- Right: Controls -->
+            <aside class="sidebar right-sidebar">
+                <div class="control-section">
+                    <label class="section-label" data-i18n="aspect-ratio">Aspect Ratio</label>
+                    <div class="ratio-group">
+                        <button class="ratio-btn active" data-ratio="NaN" data-i18n="ratio-free">Free</button>
+                        <button class="ratio-btn" data-ratio="1">1:1</button>
+                        <button class="ratio-btn" data-ratio="0.8">4:5</button>
+                        <button class="ratio-btn" data-ratio="1.777">16:9</button>
+                        <button class="ratio-btn" data-ratio="0.562">9:16</button>
                     </div>
+                </div>
 
-                    <div class="control-group">
-                        <label data-i18n="aspect-ratio">자르기 비율</label>
-                        <div class="ratio-grid">
-                            <button class="ratio-btn active" data-ratio="NaN" data-i18n="ratio-free">자유</button>
-                            <button class="ratio-btn" data-ratio="1">1:1</button>
-                            <button class="ratio-btn" data-ratio="0.8">4:5</button>
-                            <button class="ratio-btn" data-ratio="1.777">16:9</button>
-                            <button class="ratio-btn" data-ratio="0.562">9:16</button>
-                        </div>
+                <div class="control-section">
+                    <label class="section-label" data-i18n="transform">Transform</label>
+                    <div class="button-row">
+                        <button id="btn-rotate" class="icon-btn-outline" title="Rotate 90°"><i data-lucide="rotate-cw"></i></button>
+                        <button id="btn-flip-h" class="icon-btn-outline" title="Flip Horizontal"><i data-lucide="flip-horizontal-2"></i></button>
+                        <button id="btn-flip-v" class="icon-btn-outline" title="Flip Vertical"><i data-lucide="flip-vertical-2"></i></button>
                     </div>
+                </div>
 
-                    <div class="control-group">
-                        <label data-i18n="transform">변환</label>
-                        <div class="button-row">
-                            <button id="btn-rotate" title="Rotate 90°">↻</button>
-                            <button id="btn-flip-h" title="Flip Horizontal">↔</button>
-                            <button id="btn-flip-v" title="Flip Vertical">↕</button>
-                        </div>
+                <div class="control-section">
+                    <div class="label-row">
+                        <label class="section-label" data-i18n="adjust">Adjust</label>
+                        <button id="btn-copy-settings" class="text-link-btn" data-i18n="copy-settings">Copy</button>
+                        <button id="btn-paste-settings" class="text-link-btn" data-i18n="paste-settings" disabled>Paste</button>
                     </div>
-
-                    <div class="control-group">
-                        <label data-i18n="resize">크기 조절</label>
-                        <div class="input-row">
-                            <input type="number" id="input-width" placeholder="Width">
-                            <span>x</span>
-                            <input type="number" id="input-height" placeholder="Height">
-                        </div>
-                    </div>
-
-                    <div class="control-group">
-                        <label data-i18n="adjust">보정</label>
-                        <div class="range-group">
-                            <span data-i18n="brightness">밝기</span>
+                    <div class="adjust-group">
+                        <div class="slider-item">
+                            <div class="slider-label"><span data-i18n="brightness">Brightness</span><span class="val">100</span></div>
                             <input type="range" id="range-brightness" min="0" max="200" value="100">
                         </div>
-                        <div class="range-group">
-                            <span data-i18n="contrast">대비</span>
+                        <div class="slider-item">
+                            <div class="slider-label"><span data-i18n="contrast">Contrast</span><span class="val">100</span></div>
                             <input type="range" id="range-contrast" min="0" max="200" value="100">
                         </div>
-                        <div class="range-group">
-                            <span data-i18n="saturation">채도</span>
+                        <div class="slider-item">
+                            <div class="slider-label"><span data-i18n="saturation">Saturation</span><span class="val">100</span></div>
                             <input type="range" id="range-saturation" min="0" max="200" value="100">
                         </div>
                     </div>
+                </div>
 
-                    <div class="control-group">
-                        <label data-i18n="filters">필터</label>
-                        <div class="filter-grid">
-                            <button class="filter-btn" data-filter="none" data-i18n="filter-none">원본</button>
-                            <button class="filter-btn" data-filter="grayscale" data-i18n="filter-gray">그레이스케일</button>
-                            <button class="filter-btn" data-filter="sepia" data-i18n="filter-sepia">세피아</button>
-                            <button class="filter-btn" data-filter="invert" data-i18n="filter-invert">반전</button>
-                            <button class="filter-btn" data-filter="blur" data-i18n="filter-blur">흐림</button>
-                        </div>
+                <div class="control-section">
+                    <label class="section-label" data-i18n="filters">Filters</label>
+                    <div class="filter-grid-modern">
+                        <button class="filter-chip" data-filter="none" data-i18n="filter-none">None</button>
+                        <button class="filter-chip" data-filter="grayscale" data-i18n="filter-gray">Gray</button>
+                        <button class="filter-chip" data-filter="sepia" data-i18n="filter-sepia">Sepia</button>
+                        <button class="filter-chip" data-filter="invert" data-i18n="filter-invert">Invert</button>
+                        <button class="filter-chip" data-filter="blur" data-i18n="filter-blur">Blur</button>
                     </div>
+                </div>
 
-                    <div class="control-group">
-                        <label data-i18n="format">내보내기 설정</label>
-                        <select id="export-format">
-                            <option value="image/png">PNG</option>
-                            <option value="image/jpeg">JPG</option>
-                            <option value="image/webp">WebP</option>
-                            <option value="image/gif">GIF</option>
-                        </select>
-                        <div id="quality-container" class="range-group hidden">
-                            <span data-i18n="quality">품질</span>
+                <div class="control-section mt-auto border-t pt-4">
+                    <div class="export-settings">
+                        <div class="input-group">
+                            <label data-i18n="format">Format</label>
+                            <select id="export-format" class="app-select">
+                                <option value="image/png">PNG</option>
+                                <option value="image/jpeg">JPEG</option>
+                                <option value="image/webp">WebP</option>
+                                <option value="image/gif">GIF</option>
+                            </select>
+                        </div>
+                        <div id="quality-container" class="slider-item mt-2 hidden">
+                            <div class="slider-label"><span data-i18n="quality">Quality</span><span class="val">90%</span></div>
                             <input type="range" id="range-quality" min="1" max="100" value="90">
                         </div>
                     </div>
-
-                    <div class="action-buttons">
-                        <button id="btn-download" class="primary-btn" data-i18n="download">다운로드</button>
-                        <button id="btn-reset" class="secondary-btn" data-i18n="reset">초기화</button>
-                    </div>
-                </aside>
-            </div>
+                    <button id="btn-download" class="btn-primary full-width mt-4">
+                        <i data-lucide="save"></i>
+                        <span data-i18n="download">Save Image</span>
+                    </button>
+                    <button id="btn-reset" class="btn-ghost full-width mt-2" data-i18n="reset">Reset All</button>
+                </div>
+            </aside>
         </section>
     </main>
 
-    <footer>
-        <div class="container">
-            <p data-i18n="privacy-note">모든 처리는 브라우저에서 로컬로 수행됩니다. 데이터는 서버로 전송되지 않습니다.</p>
-            <div class="footer-links">
-                <a href="https://github.com/yourusername/image-cut" target="_blank">GitHub</a>
-            </div>
-        </div>
+    <footer class="app-footer">
+        <p data-i18n="privacy-note">Privacy Focused: All processing happens locally in your browser.</p>
     </footer>
 
     <script src="js/i18n.js"></script>
     <script src="js/app.js"></script>
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+    </script>
 </body>
 </html>

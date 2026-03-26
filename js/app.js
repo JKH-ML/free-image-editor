@@ -7,35 +7,30 @@ const ctx = canvas.getContext('2d');
 const thumbnailList = document.getElementById('thumbnail-list');
 const btnAddMore = document.getElementById('btn-add-more');
 
-const inputWidth = document.getElementById('input-width');
-const inputHeight = document.getElementById('input-height');
-const exportFormat = document.getElementById('export-format');
-const qualityContainer = document.getElementById('quality-container');
-const rangeQuality = document.getElementById('range-quality');
-const btnDownload = document.getElementById('btn-download');
-const btnDownloadAll = document.getElementById('btn-download-all');
-const btnReset = document.getElementById('btn-reset');
-const filterBtns = document.querySelectorAll('.filter-btn');
-const ratioBtns = document.querySelectorAll('.ratio-btn');
-
-const btnRotate = document.getElementById('btn-rotate');
-const btnFlipH = document.getElementById('btn-flip-h');
-const btnFlipV = document.getElementById('btn-flip-v');
-
 const rangeBrightness = document.getElementById('range-brightness');
 const rangeContrast = document.getElementById('range-contrast');
 const rangeSaturation = document.getElementById('range-saturation');
+const rangeQuality = document.getElementById('range-quality');
 
 const btnUndo = document.getElementById('btn-undo');
 const btnRedo = document.getElementById('btn-redo');
-
 const btnCompare = document.getElementById('btn-compare');
 const btnZoomIn = document.getElementById('btn-zoom-in');
 const btnZoomOut = document.getElementById('btn-zoom-out');
 const btnZoomReset = document.getElementById('btn-zoom-reset');
-
+const btnRotate = document.getElementById('btn-rotate');
+const btnFlipH = document.getElementById('btn-flip-h');
+const btnFlipV = document.getElementById('btn-flip-v');
+const btnDownload = document.getElementById('btn-download');
+const btnDownloadAll = document.getElementById('btn-download-all');
+const btnReset = document.getElementById('btn-reset');
 const btnCopySettings = document.getElementById('btn-copy-settings');
 const btnPasteSettings = document.getElementById('btn-paste-settings');
+
+const filterBtns = document.querySelectorAll('.filter-chip');
+const ratioBtns = document.querySelectorAll('.ratio-btn');
+const exportFormat = document.getElementById('export-format');
+const qualityContainer = document.getElementById('quality-container');
 
 let images = []; 
 let currentIndex = -1;
@@ -69,6 +64,7 @@ async function handleFiles(files) {
     }
     uploadSection.classList.add('hidden');
     editorSection.classList.remove('hidden');
+    lucide.createIcons();
 }
 
 function addImage(file) {
@@ -94,14 +90,7 @@ function addImage(file) {
 }
 
 function getDefaultState() {
-    return {
-        filter: 'none',
-        brightness: 100,
-        contrast: 100,
-        saturation: 100,
-        aspectRatio: NaN,
-        cropData: null
-    };
+    return { filter: 'none', brightness: 100, contrast: 100, saturation: 100, aspectRatio: NaN, cropData: null };
 }
 
 function renderThumbnails() {
@@ -153,10 +142,19 @@ function updateUIFromState() {
     rangeBrightness.value = s.brightness;
     rangeContrast.value = s.contrast;
     rangeSaturation.value = s.saturation;
+    
+    // Update labels
+    rangeBrightness.closest('.slider-item').querySelector('.val').textContent = s.brightness;
+    rangeContrast.closest('.slider-item').querySelector('.val').textContent = s.contrast;
+    rangeSaturation.closest('.slider-item').querySelector('.val').textContent = s.saturation;
+
     ratioBtns.forEach(btn => btn.classList.toggle('active', 
         (isNaN(s.aspectRatio) && btn.dataset.ratio === 'NaN') || 
         (parseFloat(btn.dataset.ratio) === s.aspectRatio)
     ));
+
+    filterBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.filter === s.filter));
+    
     updateHistoryButtons();
 }
 
@@ -182,17 +180,15 @@ function renderToCanvas() {
     const croppedCanvas = isComparing ? getOriginalCroppedCanvas() : cropper.getCroppedCanvas();
     if (!croppedCanvas) return;
 
-    const w = parseInt(inputWidth.value) || croppedCanvas.width;
-    const h = parseInt(inputHeight.value) || croppedCanvas.height;
-    canvas.width = w;
-    canvas.height = h;
+    canvas.width = croppedCanvas.width;
+    canvas.height = croppedCanvas.height;
 
     ctx.save();
     if (!isComparing) {
         const s = images[currentIndex].state;
         ctx.filter = [getCanvasFilter(s.filter), `brightness(${s.brightness}%)`, `contrast(${s.contrast}%)`, `saturate(${s.saturation}%)`].join(' ');
     }
-    ctx.drawImage(croppedCanvas, 0, 0, w, h);
+    ctx.drawImage(croppedCanvas, 0, 0);
     ctx.restore();
 }
 
@@ -216,7 +212,37 @@ function getCanvasFilter(filter) {
     }
 }
 
-// Settings Copy/Paste
+// Listeners
+[rangeBrightness, rangeContrast, rangeSaturation].forEach(el => {
+    el.addEventListener('change', () => saveHistory());
+    el.addEventListener('input', () => {
+        const s = images[currentIndex].state;
+        s.brightness = rangeBrightness.value;
+        s.contrast = rangeContrast.value;
+        s.saturation = rangeSaturation.value;
+        el.closest('.slider-item').querySelector('.val').textContent = el.value;
+        renderToCanvas();
+    });
+});
+
+filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        saveHistory();
+        images[currentIndex].state.filter = btn.getAttribute('data-filter');
+        updateUIFromState();
+        renderToCanvas();
+    });
+});
+
+ratioBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        saveHistory();
+        images[currentIndex].state.aspectRatio = parseFloat(btn.dataset.ratio);
+        cropper.setAspectRatio(images[currentIndex].state.aspectRatio);
+        updateUIFromState();
+    });
+});
+
 btnCopySettings.addEventListener('click', () => {
     const s = images[currentIndex].state;
     copiedSettings = { filter: s.filter, brightness: s.brightness, contrast: s.contrast, saturation: s.saturation };
@@ -231,15 +257,6 @@ btnPasteSettings.addEventListener('click', () => {
     renderToCanvas();
 });
 
-// Compare & Zoom Controls
-btnCompare.addEventListener('mousedown', () => { isComparing = true; btnCompare.classList.add('active'); renderToCanvas(); });
-btnCompare.addEventListener('mouseup', () => { isComparing = false; btnCompare.classList.remove('active'); renderToCanvas(); });
-btnCompare.addEventListener('mouseleave', () => { if (isComparing) { isComparing = false; btnCompare.classList.remove('active'); renderToCanvas(); } });
-btnZoomIn.addEventListener('click', () => { cropper.zoom(0.1); renderToCanvas(); });
-btnZoomOut.addEventListener('click', () => { cropper.zoom(-0.1); renderToCanvas(); });
-btnZoomReset.addEventListener('click', () => { cropper.reset(); renderToCanvas(); });
-
-// History Controls
 btnUndo.addEventListener('click', () => {
     const item = images[currentIndex];
     if (item.undoStack.length === 0) return;
@@ -261,126 +278,73 @@ btnRedo.addEventListener('click', () => {
 function applyState(targetState) {
     images[currentIndex].state = JSON.parse(JSON.stringify(targetState));
     updateUIFromState();
-    if (cropper) { cropper.setAspectRatio(images[currentIndex].state.aspectRatio); cropper.setData(images[currentIndex].state.cropData); }
+    if (cropper) { 
+        cropper.setAspectRatio(images[currentIndex].state.aspectRatio); 
+        cropper.setData(images[currentIndex].state.cropData); 
+    }
     renderToCanvas();
 }
 
-// Listeners
-[rangeBrightness, rangeContrast, rangeSaturation].forEach(el => {
-    el.addEventListener('change', () => saveHistory());
-    el.addEventListener('input', () => {
-        const s = images[currentIndex].state;
-        s.brightness = rangeBrightness.value;
-        s.contrast = rangeContrast.value;
-        s.saturation = rangeSaturation.value;
-        renderToCanvas();
-    });
-});
-
-filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        saveHistory();
-        images[currentIndex].state.filter = btn.getAttribute('data-filter');
-        renderToCanvas();
-    });
-});
-
-ratioBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        saveHistory();
-        ratioBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        images[currentIndex].state.aspectRatio = parseFloat(btn.dataset.ratio);
-        cropper.setAspectRatio(images[currentIndex].state.aspectRatio);
-    });
-});
-
-btnRotate.addEventListener('click', () => { saveHistory(); cropper.rotate(90); renderToCanvas(); });
-btnFlipH.addEventListener('click', () => { saveHistory(); cropper.scaleX(cropper.getData().scaleX * -1); renderToCanvas(); });
-btnFlipV.addEventListener('click', () => { saveHistory(); cropper.scaleY(cropper.getData().scaleY * -1); renderToCanvas(); });
+btnCompare.addEventListener('mousedown', () => { isComparing = true; btnCompare.classList.add('active'); renderToCanvas(); });
+btnCompare.addEventListener('mouseup', () => { isComparing = false; btnCompare.classList.remove('active'); renderToCanvas(); });
+btnCompare.addEventListener('mouseleave', () => { if (isComparing) { isComparing = false; btnCompare.classList.remove('active'); renderToCanvas(); } });
+btnZoomIn.addEventListener('click', () => cropper.zoom(0.1));
+btnZoomOut.addEventListener('click', () => cropper.zoom(-0.1));
+btnZoomReset.addEventListener('click', () => cropper.reset());
+btnRotate.addEventListener('click', () => { saveHistory(); cropper.rotate(90); });
+btnFlipH.addEventListener('click', () => { saveHistory(); cropper.scaleX(cropper.getData().scaleX * -1); });
+btnFlipV.addEventListener('click', () => { saveHistory(); cropper.scaleY(cropper.getData().scaleY * -1); });
 
 btnReset.addEventListener('click', () => { if (currentIndex !== -1) { saveHistory(); initEditor(getDefaultState()); } });
 
 exportFormat.addEventListener('change', () => {
-    const format = exportFormat.value;
-    qualityContainer.classList.toggle('hidden', !(format === 'image/jpeg' || format === 'image/webp'));
+    qualityContainer.classList.toggle('hidden', !(exportFormat.value === 'image/jpeg' || exportFormat.value === 'image/webp'));
+});
+
+rangeQuality.addEventListener('input', () => {
+    rangeQuality.closest('.slider-item').querySelector('.val').textContent = rangeQuality.value + '%';
 });
 
 // Download Logics
-function getFinalCanvas(imgItem) {
-    return new Promise((resolve) => {
-        const tempCanvas = document.createElement('canvas');
-        const tempCtx = tempCanvas.getContext('2d');
-        const s = imgItem.state;
-        
-        // If it's current image, use live cropper data
-        let cropData = s.cropData;
-        if (imgItem === images[currentIndex] && cropper) {
-            cropData = cropper.getData();
-        }
+async function getFinalCanvas(imgItem) {
+    const s = imgItem.state;
+    let cropData = (imgItem === images[currentIndex] && cropper) ? cropper.getData() : s.cropData;
+    if (!cropData) cropData = { x: 0, y: 0, width: imgItem.img.width, height: imgItem.img.height };
 
-        if (!cropData) {
-            // Default: full image if no crop data
-            cropData = { x: 0, y: 0, width: imgItem.img.width, height: imgItem.img.height, rotate: 0, scaleX: 1, scaleY: 1 };
-        }
-
-        // We need to create a temporary cropper or manual canvas transformation for non-current images
-        // To keep it simple and accurate, we use a hidden canvas approach
-        const drawCanvas = document.createElement('canvas');
-        drawCanvas.width = cropData.width;
-        drawCanvas.height = cropData.height;
-        const dCtx = drawCanvas.getContext('2d');
-
-        // Apply filters
-        dCtx.filter = [getCanvasFilter(s.filter), `brightness(${s.brightness}%)`, `contrast(${s.contrast}%)`, `saturate(${s.saturation}%)`].join(' ');
-        
-        // Manual crop & transformation
-        dCtx.save();
-        // Simplified: just draw the cropped part for background images
-        dCtx.drawImage(imgItem.img, cropData.x, cropData.y, cropData.width, cropData.height, 0, 0, cropData.width, cropData.height);
-        dCtx.restore();
-        
-        resolve(drawCanvas);
-    });
+    const drawCanvas = document.createElement('canvas');
+    drawCanvas.width = cropData.width;
+    drawCanvas.height = cropData.height;
+    const dCtx = drawCanvas.getContext('2d');
+    dCtx.filter = [getCanvasFilter(s.filter), `brightness(${s.brightness}%)`, `contrast(${s.contrast}%)`, `saturate(${s.saturation}%)`].join(' ');
+    dCtx.drawImage(imgItem.img, cropData.x, cropData.y, cropData.width, cropData.height, 0, 0, cropData.width, cropData.height);
+    return drawCanvas;
 }
 
 btnDownload.addEventListener('click', async () => {
-    const format = exportFormat.value;
-    const quality = parseInt(rangeQuality.value) / 100;
-    if (format === 'image/gif') { alert('GIF export requires additional processing.'); return; }
-
     const finalCanvas = await getFinalCanvas(images[currentIndex]);
     const link = document.createElement('a');
-    link.download = `image-editor-${Date.now()}.${format.split('/')[1]}`;
-    link.href = finalCanvas.toDataURL(format, quality);
+    link.download = `image-editor-${Date.now()}.${exportFormat.value.split('/')[1]}`;
+    link.href = finalCanvas.toDataURL(exportFormat.value, parseInt(rangeQuality.value)/100);
     link.click();
 });
 
 btnDownloadAll.addEventListener('click', async () => {
     if (images.length === 0) return;
-    
     const zip = new JSZip();
-    const format = exportFormat.value;
-    const ext = format.split('/')[1];
-    const quality = parseInt(rangeQuality.value) / 100;
-    
     btnDownloadAll.disabled = true;
-    const originalText = btnDownloadAll.innerText;
     btnDownloadAll.innerText = 'Processing...';
-
     for (let i = 0; i < images.length; i++) {
         const finalCanvas = await getFinalCanvas(images[i]);
-        const dataUrl = finalCanvas.toDataURL(format, quality);
-        const base64Data = dataUrl.split(',')[1];
-        zip.file(`image-${i+1}.${ext}`, base64Data, {base64: true});
+        const dataUrl = finalCanvas.toDataURL(exportFormat.value, parseInt(rangeQuality.value)/100);
+        zip.file(`image-${i+1}.${exportFormat.value.split('/')[1]}`, dataUrl.split(',')[1], {base64: true});
     }
-
     const content = await zip.generateAsync({type: "blob"});
     const link = document.createElement('a');
     link.href = URL.createObjectURL(content);
-    link.download = `image-cut-all-${Date.now()}.zip`;
+    link.download = `image-editor-all-${Date.now()}.zip`;
     link.click();
-
     btnDownloadAll.disabled = false;
-    btnDownloadAll.innerText = originalText;
+    btnDownloadAll.innerHTML = `<i data-lucide="download"></i> <span>Download All (ZIP)</span>`;
+    lucide.createIcons();
+    updateContent();
 });
