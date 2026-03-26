@@ -60,18 +60,26 @@ h1 {
     letter-spacing: -0.02em;
 }
 
-.marketing-badges {
-    display: flex;
-    gap: 0.5rem;
+.app-select-small {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted-fg);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s;
 }
 
-.badge {
-    font-size: 0.7rem;
+.app-select-small:hover {
     background: var(--muted);
-    color: var(--muted-fg);
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-weight: 500;
+    color: var(--fg);
+}
+
+.app-select-small option {
+    background: var(--bg);
+    color: var(--fg);
 }
 
 .header-right {
